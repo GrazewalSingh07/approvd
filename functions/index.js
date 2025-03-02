@@ -1,11 +1,10 @@
 import functions from "firebase-functions";
 import Razorpay from "razorpay";
 import cors from "cors";
-import 'dotenv/config'
 
 const razorpay = new Razorpay({
-  key_id: process.env.TEST_KEY_ID,
-  key_secret: process.env.TEST_KEY_SECRET,
+  key_id: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
+  key_secret: import.meta.env.VITE_RAZORPAY_TEST_KEY_SECRET,
 });
 
 export const createOrder = functions.https.onRequest((req, res) => {
@@ -15,7 +14,6 @@ export const createOrder = functions.https.onRequest((req, res) => {
     }
 
     const { amount } = req.body;
-    console.log(res.body, 'amt');
 
     try {
       const options = {
