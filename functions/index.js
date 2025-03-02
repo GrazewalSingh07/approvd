@@ -1,20 +1,21 @@
-
-const functions = require("firebase-functions");
-const Razorpay = require("razorpay");
-const cors = require("cors")({origin: true}); // Import and use CORS middleware
+import functions from "firebase-functions";
+import Razorpay from "razorpay";
+import cors from "cors";
+import 'dotenv/config'
 
 const razorpay = new Razorpay({
-  key_id: "rzp_test_Gg4MocF5ZN47X5",
-  key_secret: "97F269sirVcVgmkEEDVFX4mk",
+  key_id: process.env.TEST_KEY_ID,
+  key_secret: process.env.TEST_KEY_SECRET,
 });
 
-exports.createOrder = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => { // Wrap your function inside cors()
+export const createOrder = functions.https.onRequest((req, res) => {
+  cors({ origin: true })(req, res, async () => {
     if (req.method !== "POST") {
-      return res.status(400).json({message: "Invalid request method"});
+      return res.status(400).json({ message: "Invalid request method" });
     }
 
-    const {amount} = req.body;
+    const { amount } = req.body;
+    console.log(res.body, 'amt');
 
     try {
       const options = {
@@ -26,8 +27,7 @@ exports.createOrder = functions.https.onRequest((req, res) => {
       res.status(200).json(order);
     } catch (error) {
       console.error(error);
-      res.status(500).json({error: "Failed to create Razorpay order"});
+      res.status(500).json({ error: "Failed to create Razorpay order" });
     }
   });
 });
-
