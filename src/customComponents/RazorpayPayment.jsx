@@ -31,7 +31,7 @@ const RazorpayPayment = ({ totalAmount }) => {
 
     // Call Firebase Cloud Function to create a new order
     const result = await fetch(
-      'https://approvd-41bd1.cloudfunctions.net/createOrder', // Replace with your Firebase Cloud Function URL
+      'http://127.0.0.1:5001/approvd-41bd1/us-central1/createOrder', // Replace with your Firebase Cloud Function URL
       {
         method: 'POST',
         headers: {
@@ -50,13 +50,13 @@ const RazorpayPayment = ({ totalAmount }) => {
     const { amount, id: order_id, currency } = result;
 
     const options = {
-      key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay API Key
+      key: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
       amount: amount.toString(),
       currency: currency,
       name: 'Your Company Name',
       description: 'Test Transaction',
       order_id: order_id, // This is the order ID created by Razorpay
-      handler: function (response) {
+      handler: function(response) {
         // Handle the payment success
         message.success('Payment successful!');
         console.log(response);
@@ -79,7 +79,7 @@ const RazorpayPayment = ({ totalAmount }) => {
   return (
     <div>
       <Button onClick={handlePayment} loading={loading}>
-      Proceed to payment | Total Price: ₹{totalAmount}
+        Proceed to payment | Total Price: ₹{totalAmount}
       </Button>
     </div>
   );
