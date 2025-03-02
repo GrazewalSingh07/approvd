@@ -39,7 +39,7 @@ export const ProductDetail = () => {
   const handleAddToCart = async () => {
     try {
       if (!currentUser) {
-        alert("Please log in to add items to the cart");
+        messageApi.warning('Please log in to add items to the cart');
         return;
       }
 
