@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Button, message } from 'antd';
+import { useState } from 'react';
+import { Button } from 'antd';
+import toast from 'react-hot-toast';
 
 const RazorpayPayment = ({ totalAmount }) => {
   const [loading, setLoading] = useState(false);
@@ -24,64 +25,77 @@ const RazorpayPayment = ({ totalAmount }) => {
     const scriptLoaded = await loadRazorpayScript();
 
     if (!scriptLoaded) {
-      message.error('Failed to load Razorpay SDK. Please check your connection.');
+      toast.dismiss();
+      toast.error('Failed to load Razorpay SDK. Please check your connection.');
       setLoading(false);
       return;
     }
 
-    // Call Firebase Cloud Function to create a new order
-    const result = await fetch(
-      'http://127.0.0.1:5001/approvd-41bd1/us-central1/createOrder', // Replace with your Firebase Cloud Function URL
-      {
+    try {
+      const result = await fetch(
+        'http://127.0.0.1:5001/approvd-41bd1/us-central1/createOrder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount: totalAmount }), // Send the amount to Cloud Function
+        body: JSON.stringify({ amount: totalAmount }),
       }
-    ).then((res) => res.json());
+      )
+      const { amount, id: order_id, currency } = await result.json();
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
+        amount: amount.toString(),
+        currency,
+        name: 'Approvd',
+        description: 'Test Transaction',
+        order_id, // This is the order ID created by Razorpay
+        handler: function(response) {
+          fetch('http://127.0.0.1:5001/approvd-41bd1/us-central1/verifyPayment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(response),
+          }).then((response) => {
+            if (response.status === 200) {
+              toast.success('Payment verified successfully');
+            } else {
+              toast.error('Payment verification failed');
+            }
+          });
+        },
+        prefill: {
+          name: 'Customer Name',
+          email: 'test@example.com',
+          contact: '9999999999',
+        },
+        theme: {
+          color: '#F37254',
+        },
+      };
 
-    if (!result) {
-      message.error('Server error. Please try again later.');
-      setLoading(false);
+      // open the payment window
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
+    } catch (error) {
+      console.log(error, 'error');
+      toast.dismiss();
+      toast.error('Server error. Please try again later.');
       return;
+    } finally {
+      setLoading(false);
     }
-
-    const { amount, id: order_id, currency } = result;
-
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
-      amount: amount.toString(),
-      currency: currency,
-      name: 'Your Company Name',
-      description: 'Test Transaction',
-      order_id: order_id, // This is the order ID created by Razorpay
-      handler: function(response) {
-        // Handle the payment success
-        message.success('Payment successful!');
-        console.log(response);
-      },
-      prefill: {
-        name: 'Customer Name',
-        email: 'customer@example.com',
-        contact: '9999999999',
-      },
-      theme: {
-        color: '#F37254',
-      },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
-    setLoading(false);
   };
 
   return (
-    <div>
-      <Button onClick={handlePayment} loading={loading}>
-        Proceed to payment | Total Price: ₹{totalAmount}
-      </Button>
-    </div>
+    <>
+      <div>
+        <Button onClick={handlePayment} loading={loading}>
+          Proceed to payment | Total Price: ₹{totalAmount}
+        </Button>
+      </div>
+    </>
   );
 };
 
