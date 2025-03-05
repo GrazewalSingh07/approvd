@@ -1,6 +1,25 @@
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 
+export const updateCart = async (data) => {
+  const user = auth.currentUser;
+  if (!user) {
+    console.error("User is not signed in.");
+    return null;
+  }
+  const uid = user.uid;
+  const cartRef = doc(db, "carts", uid);
+  try {
+    const cartDoc = await getDoc(cartRef);
+    if (!cartDoc.exists()) return;
+
+    await updateDoc(cartRef, { ...data });
+  } catch (error) {
+    console.error("Error updating cart: ", error);
+    throw error;
+  }
+};
+
 
 export const updateCartItem = async (item, quantityChange) => {
   const user = auth.currentUser;
