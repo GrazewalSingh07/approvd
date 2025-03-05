@@ -1,64 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCartData, updateCartItem, removeCartItem } from "../services/cartService";
 import { Button, Row, Col, Collapse } from 'antd';
 import useWindowSize from '../hooks/useBreakpoints';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import RazorpayPayment from '../customComponents/RazorpayPayment';
- 
+
 
 export const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const size = useWindowSize(); // Get screen size using the custom hook
   const [totalPrice, setTotalPrice] = useState(0);
- 
-const { Panel } = Collapse;
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const items = await getCartData();
-        setCartItems(items); // Set the cart items in the state
-      } catch (error) {
-        console.error("Error fetching cart items: ", error);
-      }
-    };
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [deliveryCharge, setDeliveryCharge] = useState(50); // Set your delivery charge
 
+  const { Panel } = Collapse;
+
+  const fetchCartItems = async () => {
+    try {
+      const cartData = await getCartData();
+      setCartItems(cartData);
+    } catch (error) {
+      console.error("Error fetching cart items: ", error);
+    }
+  };
+
+  useEffect(() => {
     fetchCartItems();
   }, []);
-  useEffect(() => {
-    calculateTotalPrice(cartItems); 
-  },[cartItems])
 
   const calculateTotalPrice = (items) => {
-    
+    if (!Array.isArray(items)) return;
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotalPrice(total); // Set the calculated total price in state
   };
 
-  // Function to handle quantity increment
-  const handleIncrement = async (item) => {
-    await updateCartItem(item, 1); // Increase quantity by 1
-    // Refetch cart data
-    const items = await getCartData();
-    setCartItems(items);
-     
+  useEffect(() => {
+    calculateTotalPrice(cartItems?.items);
+  }, [cartItems])
+
+  const changeQuantity = async (item, quantity) => {
+    await updateCartItem(item, quantity);
+    await fetchCartItems();
   };
 
-   
-  const handleDecrement = async (item) => {
-    await updateCartItem(item, -1);  
-    
-    const items = await getCartData();
-    setCartItems(items);
-    
-  };
-
-  // Function to handle item removal
   const handleRemove = async (item) => {
-    await removeCartItem(item); // Remove item from cart
-    // Refetch cart data
-    const items = await getCartData();
-    setCartItems(items);
-    
+    await removeCartItem(item);
+    await fetchCartItems();
   };
 
   // Dynamic style based on window size
@@ -82,10 +69,8 @@ const { Panel } = Collapse;
     }
   };
 
-  const styles = getStyles(); 
-  const [couponDiscount, setCouponDiscount] = useState(0);  
-  const [deliveryCharge, setDeliveryCharge] = useState(50); // Set your delivery charge
-  
+  const styles = getStyles();
+
   // Function to calculate total with coupon and delivery charge
   const calculateFinalTotal = () => {
     let discountedAmount = totalPrice - (totalPrice * couponDiscount / 100);
@@ -96,11 +81,11 @@ const { Panel } = Collapse;
     <div style={{ padding: '16px' }}>
       <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Your Cart</h2>
 
-      {cartItems.length === 0 ? (
+      {cartItems?.items?.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <div>
-          {cartItems.map((item, index) => (
+          {cartItems?.items?.map((item, index) => (
             <div
               key={index}
               style={{
@@ -112,9 +97,9 @@ const { Panel } = Collapse;
             >
               <Row gutter={[16, 16]}  >
                 {/* First Column: Image */}
-                 
-                <Col  xs={8} style={{ textAlign: 'center' }}>
-                  <div style={{ maxHeight:'120px', overflow: 'hidden' }}>
+
+                <Col xs={8} style={{ textAlign: 'center' }}>
+                  <div style={{ maxHeight: '120px', overflow: 'hidden' }}>
                     <img
                       src={item.image}
                       alt={item.name}
@@ -124,16 +109,16 @@ const { Panel } = Collapse;
                 </Col>
 
                 {/* Second Column: Name, Price, Quantity */}
-                <Col  xs={16} >
+                <Col xs={16} >
                   <p className='text-black '>{item.name}</p>
                   <p style={{ color: '#555' }}>Price: ₹{item.price}</p>
                   <p style={{ color: '#555' }}>Quantity: {item.quantity}</p>
                   <div style={{ display: 'flex', marginTop: '8px' }}>
-                    <Button onClick={() => handleDecrement(item)} style={{ marginRight: '8px' }}>-</Button>
-                    <Button onClick={() => handleIncrement(item)}>+</Button>
+                    <Button onClick={() => changeQuantity(item, -1)} style={{ marginRight: '8px' }}>-</Button>
+                    <Button onClick={() => changeQuantity(item, 1)}>+</Button>
                   </div>
                 </Col>
-               
+
 
                 {/* Third Column: Remove button */}
                 <Col xs={24} sm={6}>
@@ -154,20 +139,20 @@ const { Panel } = Collapse;
               </Row>
             </div>
           ))}
-           
-           <div  className='my-4' style={{  textAlign: 'right' }}>
-           <Collapse   style={{ marginTop: '16px' }}>
-            <Panel header={<span style={{ color: 'black' }}>Price Breakdown <ArrowRightOutlined/></span>} key="1">
-              <p>Total Price: ₹{totalPrice}</p>
-              <p>Coupon Discount: {couponDiscount}%</p>
-              <p>Delivery Charge: ₹{deliveryCharge}</p>
-              <p>Final Total: ₹{calculateFinalTotal()}</p>
-            </Panel>
-          </Collapse>
-           
+
+          <div className='my-4' style={{ textAlign: 'right' }}>
+            <Collapse style={{ marginTop: '16px' }}>
+              <Panel header={<span style={{ color: 'black' }}>Price Breakdown <ArrowRightOutlined /></span>} key="1">
+                <p>Total Price: ₹{totalPrice}</p>
+                <p>Coupon Discount: {couponDiscount}%</p>
+                <p>Delivery Charge: ₹{deliveryCharge}</p>
+                <p>Final Total: ₹{calculateFinalTotal()}</p>
+              </Panel>
+            </Collapse>
+
           </div>
-         <div className='text-right'>  <RazorpayPayment totalAmount={calculateFinalTotal()}/>
-         </div> 
+          <div className='text-right'>  <RazorpayPayment cartData={cartItems} totalAmount={calculateFinalTotal()} />
+          </div>
         </div>
       )}
 
