@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "approvd-41bd1"
-  }
+    "default": "approvd-41bd1",
+    "approvd": "approvd-10fe6"
+  },
+  "targets": {},
+  "etags": {}
 }
