@@ -1,17 +1,17 @@
-import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { useLocation } from 'react-router-dom';
-import { Alert, Button, Carousel, Divider, Flex, Space, message } from "antd";
+import { Button, Carousel, Divider, Flex, Space } from "antd";
 import { QuantityCounter } from "../customComponents/QuantityCounter";
 import { addToCart } from "../services/cartService";
+import toast from 'react-hot-toast';
 
 export const ProductDetail = () => {
   const location = useLocation();
   const currentUser = auth.currentUser;
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
-  const [messageApi, contextHolder] = message.useMessage();
 
   const queryParams = new URLSearchParams(location.search);
   const productId = queryParams.get("id");
@@ -38,9 +38,10 @@ export const ProductDetail = () => {
   }, [productId]);
 
   const handleAddToCart = async () => {
+    toast.dismiss();
     try {
       if (!currentUser) {
-        messageApi.warning('Please log in to add items to the cart');
+        toast.error('Please log in to add items to the cart');
         return;
       }
 
@@ -54,28 +55,15 @@ export const ProductDetail = () => {
       };
 
       await addToCart(cartItem);
-
-      messageApi.open({
-        type: 'success',
-        content: 'Product added to cart',
-        className: 'text-white',
-
-      });
+      toast.success('Product added to cart');
 
     } catch (error) {
-      messageApi.open({
-        type: 'error',
-        content: 'Something went Wrong!',
-        className: 'text-white',
-
-      });
-
+      toast.error('Something went wrong.');
     }
   };
 
   return (
     <div className="h-screen max-w-[1660px] overflow-y-scroll  md:p-8 m-auto">
-      {contextHolder}
       {product ? (
 
         <div className="flex max-md:flex-col justify-center m-auto">

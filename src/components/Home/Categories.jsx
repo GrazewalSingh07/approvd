@@ -12,7 +12,7 @@ export const Categories = () => {
     navigate(`/products?type=${data.type}&category=${data.category}`)
   }
 
-  const fetchProducts = async () => {
+  const fetchCategories = async () => {
     const productsRef = collection(db, "categories");
     try {
       const querySnapshot = await getDocs(productsRef);
@@ -29,7 +29,7 @@ export const Categories = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchCategories();
   }, [])
 
   return (
