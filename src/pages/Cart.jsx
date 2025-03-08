@@ -1,42 +1,30 @@
 import { useEffect, useState } from 'react';
-import { getCartData, updateCartItem, removeCartItem } from "../services/cartService";
+import { getCartData, updateCartItem, removeCartItem, updateCart } from "../services/cartService";
 import { Button, Row, Col, Collapse } from 'antd';
 import useWindowSize from '../hooks/useBreakpoints';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import RazorpayPayment from '../customComponents/RazorpayPayment';
+import { calculateTotals } from '../utils/calculateTotals';
 
 
 export const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const size = useWindowSize(); // Get screen size using the custom hook
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [deliveryCharge, setDeliveryCharge] = useState(50); // Set your delivery charge
 
   const { Panel } = Collapse;
 
   const fetchCartItems = async () => {
     try {
       const cartData = await getCartData();
-      setCartItems(cartData);
+      setCartItems(cartData)
     } catch (error) {
       console.error("Error fetching cart items: ", error);
     }
   };
 
   useEffect(() => {
-    fetchCartItems();
+    fetchCartItems()
   }, []);
-
-  const calculateTotalPrice = (items) => {
-    if (!Array.isArray(items)) return;
-    const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    setTotalPrice(total); // Set the calculated total price in state
-  };
-
-  useEffect(() => {
-    calculateTotalPrice(cartItems?.items);
-  }, [cartItems])
 
   const changeQuantity = async (item, quantity) => {
     await updateCartItem(item, quantity);
@@ -47,6 +35,23 @@ export const Cart = () => {
     await removeCartItem(item);
     await fetchCartItems();
   };
+
+  const price = () => calculateTotals(cartItems?.items)?.price;
+  const totalPrice = () => calculateTotals(cartItems?.items)?.totalPrice;
+  const gst = () => calculateTotals(cartItems?.items)?.gst;
+  const shipping = () => calculateTotals(cartItems?.items)?.shipping;
+
+  const collapseContent =
+  {
+    key: '1',
+    label: <span style={{ color: 'black' }}>Price Breakdown <ArrowRightOutlined /></span>,
+    children: <>
+      <p>Total Price: ₹{price()}</p>
+      <p>Tax ( GST ): {gst()}</p>
+      <p>Delivery Charge: ₹{shipping()}</p>
+      <p>Final Total: ₹{totalPrice()}</p>
+    </>,
+  }
 
   // Dynamic style based on window size
   const getStyles = () => {
@@ -71,12 +76,6 @@ export const Cart = () => {
 
   const styles = getStyles();
 
-  // Function to calculate total with coupon and delivery charge
-  const calculateFinalTotal = () => {
-    let discountedAmount = totalPrice - (totalPrice * couponDiscount / 100);
-    let finalAmount = discountedAmount + deliveryCharge;
-    return finalAmount;
-  };
   return (
     <div style={{ padding: '16px' }}>
       <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Your Cart</h2>
@@ -141,17 +140,9 @@ export const Cart = () => {
           ))}
 
           <div className='my-4' style={{ textAlign: 'right' }}>
-            <Collapse style={{ marginTop: '16px' }}>
-              <Panel header={<span style={{ color: 'black' }}>Price Breakdown <ArrowRightOutlined /></span>} key="1">
-                <p>Total Price: ₹{totalPrice}</p>
-                <p>Coupon Discount: {couponDiscount}%</p>
-                <p>Delivery Charge: ₹{deliveryCharge}</p>
-                <p>Final Total: ₹{calculateFinalTotal()}</p>
-              </Panel>
-            </Collapse>
-
+            <Collapse style={{ marginTop: '16px' }} items={[collapseContent]} />
           </div>
-          <div className='text-right'>  <RazorpayPayment cartData={cartItems} totalAmount={calculateFinalTotal()} />
+          <div className='text-right'>  <RazorpayPayment cartData={cartItems} totalAmount={totalPrice()} />
           </div>
         </div>
       )}

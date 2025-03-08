@@ -4,6 +4,7 @@ import { auth, db } from '../firebase/firebase';
 import { useLocation } from 'react-router-dom';
 import { Alert, Button, Carousel, Divider, Flex, Space, message } from "antd";
 import { QuantityCounter } from "../customComponents/QuantityCounter";
+import { addToCart } from "../services/cartService";
 
 export const ProductDetail = () => {
   const location = useLocation();
@@ -43,10 +44,6 @@ export const ProductDetail = () => {
         return;
       }
 
-      // Reference to the user's cart document
-      const cartRef = doc(db, 'carts', currentUser.uid);
-      const cartDoc = await getDoc(cartRef);
-
       const cartItem = {
         id: productId,
         name: product.name,
@@ -56,17 +53,7 @@ export const ProductDetail = () => {
         image: product.images[0],
       };
 
-      if (cartDoc.exists()) {
-        // Update existing cart (push new item into array or increase quantity)
-        await updateDoc(cartRef, {
-          items: arrayUnion(cartItem)
-        });
-      } else {
-        // Create a new cart document if it doesn't exist
-        await setDoc(cartRef, {
-          items: [cartItem]
-        });
-      }
+      await addToCart(cartItem);
 
       messageApi.open({
         type: 'success',

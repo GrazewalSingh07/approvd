@@ -1,5 +1,6 @@
-import { doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, arrayUnion, getDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
+import { calculateTotals } from "../utils/calculateTotals";
 
 export const updateCart = async (data) => {
   const user = auth.currentUser;
@@ -37,7 +38,6 @@ export const updateCartItem = async (item, quantityChange) => {
     if (!cartDoc.exists()) return;
 
     const cartItems = cartDoc.data().items;
-    console.log(cartItems, 'cartItems')
 
     const updatedItems = cartItems.map(cartItem =>
       cartItem.id === item.id
@@ -46,9 +46,12 @@ export const updateCartItem = async (item, quantityChange) => {
     );
 
     const filteredItems = updatedItems.filter(cartItem => cartItem.quantity > 0);
+    const totalPrice = calculateTotals(filteredItems)?.totalPrice;
 
     await updateDoc(cartRef, {
       items: filteredItems,
+      ...(filteredItems?.length && { totalPrice }),
+      ...(filteredItems?.length === 0 && { totalPrice: deleteField() })
     });
   } catch (error) {
     console.error("Error updating cart: ", error);
@@ -74,9 +77,12 @@ export const removeCartItem = async (item) => {
     const cartItems = cartDoc.data().items;
 
     const updatedItems = cartItems.filter(cartItem => cartItem.id !== item.id);
+    const totalPrice = calculateTotals(cartItems)?.totalPrice;
 
     await updateDoc(cartRef, {
       items: updatedItems,
+      ...(updatedItems?.length && { totalPrice }),
+      ...(updatedItems?.length === 0 && { totalPrice: deleteField() })
     });
   } catch (error) {
     console.error("Error removing item from cart: ", error);
@@ -108,3 +114,26 @@ export const getCartData = async () => {
     throw error;
   }
 };
+
+export const addToCart = async (item) => {
+  const user = auth.currentUser;
+  const cartRef = doc(db, 'carts', user.uid);
+  const cartDoc = await getDoc(cartRef);
+
+  if (cartDoc.exists()) {
+    // Update existing cart (push new item into array)
+    const combinedCartItems = cartDoc.data().items.concat(item);
+    const totalPrice = calculateTotals(combinedCartItems)?.totalPrice;
+    await updateDoc(cartRef, {
+      items: arrayUnion(item),
+      totalPrice
+    });
+  } else {
+    // Create a new cart document if it doesn't exist
+    const totalPrice = calculateTotals([item])?.totalPrice;
+    await setDoc(cartRef, {
+      items: [item],
+      totalPrice
+    });
+  }
+} 

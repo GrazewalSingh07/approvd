@@ -3,8 +3,10 @@ import { Button } from 'antd';
 import toast from 'react-hot-toast';
 import { updateCart } from "../services/cartService";
 import { getCurrentUser } from "../services/userAuth";
+import { useNavigate } from 'react-router-dom';
 
 const RazorpayPayment = ({ totalAmount }) => {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
 
   const loadRazorpayScript = () => {
@@ -67,6 +69,7 @@ const RazorpayPayment = ({ totalAmount }) => {
           }).then((res) => {
             if (res.status === 200) {
               toast.success('Payment verified successfully');
+              navigate('/')
             } else {
               toast.error('Payment verification failed');
             }

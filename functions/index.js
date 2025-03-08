@@ -57,7 +57,6 @@ const clearCart = async (userId) => {
 
 const moveCartToOrders = async (userId, paymentId) => {
   const payment = await razorpay.payments.fetch(paymentId);
-  console.log(payment, 'payment')
 
   if (payment.status !== "captured") {
     throw new Error("Payment not captured. Do not process order.");
@@ -78,11 +77,11 @@ const moveCartToOrders = async (userId, paymentId) => {
     items: cartData.items,
     totalPrice: cartData.totalPrice,
     paymentId,
-    status: "pending",
+    status: "pending", // Initial order status
     createdAt: admin.firestore.Timestamp.now(),
   });
 
-  clearCart(uid)
+  clearCart(userId)
 }
 
 export const verifyPayment = functions.https.onRequest(async (req, res) => {
