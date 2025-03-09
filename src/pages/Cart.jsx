@@ -80,7 +80,7 @@ export const Cart = () => {
     <div style={{ padding: '16px' }}>
       <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Your Cart</h2>
 
-      {cartItems?.items?.length === 0 ? (
+      {!cartItems?.items?.length ? (
         <p>Your cart is empty.</p>
       ) : (
         <div>
