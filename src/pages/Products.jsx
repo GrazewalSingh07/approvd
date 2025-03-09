@@ -3,6 +3,7 @@ import React from 'react';
 import { db } from '../firebase/firebase';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Carousel, Col, Row } from "antd";
+import { useQuery } from "@tanstack/react-query";
 
 export const Products = () => {
   const location = useLocation();
@@ -38,11 +39,11 @@ export const Products = () => {
           <div><p className="text-black">Loading...</p></div>
         ) : error ? (
           <div><p className="text-red-500">{error}</p></div> // Display error message
-        ) : products.length === 0 ? (
+        ) : products?.length === 0 ? (
           <div><p className="text-black">No products found.</p></div> // Display empty state message
         ) : (
           <Row className="justify-center" gutter={[16, 16]}>
-            {products.map((el, index) => (
+            {products?.map((el, index) => (
               <Col key={el.id} onClick={handleClick(el)} className="cursor-pointer">
                 <div className="h-[400px] w-[320px] shadow-md hover:shadow-2xl p-4" key={index}>
                   <Carousel>
