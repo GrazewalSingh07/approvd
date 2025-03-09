@@ -1,4 +1,3 @@
-
 import { Badge, Button, Drawer, Dropdown, Flex, Space, Tooltip, message } from 'antd'
 import React, { useState } from 'react'
 import { IoCartOutline, IoMailOutline } from 'react-icons/io5';
@@ -6,48 +5,18 @@ import { MdAccountCircle } from 'react-icons/md';
 import { CiMenuBurger } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/authContext';
-import { auth } from '../../firebase/firebase';
 import { doSignOut } from '../../firebase/auth';
+import { getCartData } from '../../services/cartService';
+import { useQuery } from '@tanstack/react-query';
 
 export const Navbar = () => {
-  const items = [
-    {
-      key: '1',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-          1st menu item
-        </a>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          2nd menu item (disabled)
-        </a>
-      ),
-
-      disabled: true,
-    },
-    {
-      key: '3',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-          3rd menu item (disabled)
-        </a>
-      ),
-      disabled: true,
-    },
-    {
-      key: '4',
-      danger: true,
-      label: 'a danger item',
-    },
-  ];
   const [messageApi, contextHolder] = message.useMessage();
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState('right');
   const { userLoggedIn } = useAuth()
+
+  const { data: cartItems } = useQuery({ queryKey: ['cart'], queryFn: getCartData })
+
   const showDrawer = () => {
     setOpen(true);
   };
@@ -135,7 +104,7 @@ export const Navbar = () => {
             <IoMailOutline color='white' size={32} />
 
           </Tooltip>
-          {userLoggedIn && <Badge count={5}><Tooltip onClick={() => navigate("/cart")} className='cursor-pointer' placement="bottomLeft" title={'My cart'} >
+          {userLoggedIn && <Badge count={cartItems?.items?.length}><Tooltip onClick={() => navigate("/cart")} className='cursor-pointer' placement="bottomLeft" title={'My cart'} >
             <IoCartOutline color='white' size={32} />
           </Tooltip></Badge>}
 
@@ -152,7 +121,7 @@ export const Navbar = () => {
 
         <Space className='md:hidden visible'>
           <Button size='large' type="text" onClick={showDrawer}>
-            <CiMenuBurger />
+            <CiMenuBurger color='white' />
           </Button>
         </Space>
 

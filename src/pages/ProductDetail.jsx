@@ -1,17 +1,19 @@
 import { doc, getDoc } from "firebase/firestore";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { useLocation } from 'react-router-dom';
 import { Button, Carousel, Divider, Flex, Space } from "antd";
 import { QuantityCounter } from "../customComponents/QuantityCounter";
 import { addToCart } from "../services/cartService";
 import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const ProductDetail = () => {
   const location = useLocation();
   const currentUser = auth.currentUser;
   const [quantity, setQuantity] = useState(1);
-  const [product, setProduct] = useState(null);
+
+  const queryClient = useQueryClient();
 
   const queryParams = new URLSearchParams(location.search);
   const productId = queryParams.get("id");
@@ -19,11 +21,11 @@ export const ProductDetail = () => {
   const fetchProductDetails = async () => {
     if (productId) {
       try {
-        const productDoc = doc(db, 'products', productId);        // const productDoc = doc(db, category, productId);
+        const productDoc = doc(db, 'products', productId);
         const productSnapshot = await getDoc(productDoc);
 
         if (productSnapshot.exists()) {
-          setProduct(productSnapshot.data());
+          return productSnapshot.data();
         } else {
           console.log("No such document!");
         }
@@ -33,33 +35,34 @@ export const ProductDetail = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProductDetails();
-  }, [productId]);
+  const { data: product } = useQuery({ queryKey: ['product', productId], queryFn: fetchProductDetails })
+
+  const { mutate } = useMutation({
+    mutationFn: addToCart,
+    onSuccess: () => {
+      toast.success('Product added to cart');
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+    },
+    onError: () => {
+      toast.error('Something went wrong.');
+    }
+  })
 
   const handleAddToCart = async () => {
     toast.dismiss();
-    try {
-      if (!currentUser) {
-        toast.error('Please log in to add items to the cart');
-        return;
-      }
-
-      const cartItem = {
-        id: productId,
-        name: product.name,
-        price: product.price,
-        quantity: quantity,
-        totalPrice: product.price * quantity,
-        image: product.images[0],
-      };
-
-      await addToCart(cartItem);
-      toast.success('Product added to cart');
-
-    } catch (error) {
-      toast.error('Something went wrong.');
+    if (!currentUser) {
+      toast.error('Please log in to add items to the cart');
+      return;
     }
+    const cartItem = {
+      id: productId,
+      name: product.name,
+      price: product.price,
+      quantity: quantity,
+      totalPrice: product.price * quantity,
+      image: product.images[0],
+    };
+    mutate(cartItem);
   };
 
   return (

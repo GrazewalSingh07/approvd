@@ -1,12 +1,10 @@
 import { Flex, Space } from 'antd';
-import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/firebase';
 import { collection, getDocs } from "firebase/firestore";
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export const Categories = () => {
-  const [products, setProducts] = useState([]);
   const navigate = useNavigate()
   const handleClick = (data) => () => {
     navigate(`/products?type=${data.type}&category=${data.category}`)
@@ -21,16 +19,13 @@ export const Categories = () => {
         const productData = { id: doc.id, ...doc.data() };
         data.push(productData);
       });
-      setProducts(data);
+      return data;
     } catch (error) {
       console.error("Error getting documents: ", error);
-      setProducts([]);
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, [])
+  const { data: products } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
 
   return (
     <Flex justify='space-evenly' gap={10} className='max-w-[1600px] my-8 mx-auto overflow-scroll cursor-pointer '>

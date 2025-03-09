@@ -1,8 +1,6 @@
 import { Button, InputNumber } from 'antd'; // Import Ant Design components
 
 export const QuantityCounter = ({ quantity, setQuantity }) => {
-
-
   const increment = () => {
     const newQuantity = quantity + 1;
     setQuantity(newQuantity);

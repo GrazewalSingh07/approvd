@@ -14,7 +14,7 @@ const { Text, Title } = Typography;
 
 export const CustomFooter = () => {
   return (<>
-    <Footer style={{  color: "#fff", padding: "40px" }}>
+    <Footer style={{ color: "#fff", padding: "40px", backgroundColor: "#000" }}>
       <Row justify="space-around" align="middle">
         {/* Contact Info */}
         <Col xs={24} sm={12} md={6}>
@@ -46,9 +46,9 @@ export const CustomFooter = () => {
             Quick Links
           </Title>
           <Space direction="vertical">
-            <Text className="hover:underline underline-offset-4" style={{ color: "#fff" ,cursor:"pointer"}}>About Us</Text>
-            <Text className="hover:underline underline-offset-4" style={{ color: "#fff" ,cursor:"pointer"}}>Privacy Policy</Text>
-            <Text className="hover:underline underline-offset-4" style={{ color: "#fff" ,cursor:"pointer"}}>Terms of Service</Text>
+            <Text className="hover:underline underline-offset-4" style={{ color: "#fff", cursor: "pointer" }}>About Us</Text>
+            <Text className="hover:underline underline-offset-4" style={{ color: "#fff", cursor: "pointer" }}>Privacy Policy</Text>
+            <Text className="hover:underline underline-offset-4" style={{ color: "#fff", cursor: "pointer" }}>Terms of Service</Text>
           </Space>
         </Col>
 
@@ -58,21 +58,21 @@ export const CustomFooter = () => {
             Follow Us
           </Title>
           <Space size="large">
-            <FacebookOutlined style={{ fontSize: "24px", color: "#fff" ,cursor:"pointer"}} />
-            <TwitterOutlined style={{ fontSize: "24px", color: "#fff",cursor:"pointer" }} />
-            <InstagramOutlined style={{ fontSize: "24px", color: "#fff" ,cursor:"pointer"}} />
-             
+            <FacebookOutlined style={{ fontSize: "24px", color: "#fff", cursor: "pointer" }} />
+            <TwitterOutlined style={{ fontSize: "24px", color: "#fff", cursor: "pointer" }} />
+            <InstagramOutlined style={{ fontSize: "24px", color: "#fff", cursor: "pointer" }} />
+
           </Space>
         </Col>
       </Row>
     </Footer>
     <div style={{ backgroundColor: "#000", color: "#fff", textAlign: "center", padding: "10px 0" }}>
-    <Text>
-      Proudly made in India 🇮🇳 | © {new Date().getFullYear()} Approvd
-    </Text>
-  </div>
+      <Text className="text-white">
+        Proudly made in India 🇮🇳 | © {new Date().getFullYear()} Approvd
+      </Text>
+    </div>
   </>
   );
 };
 
- 
+

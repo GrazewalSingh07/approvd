@@ -1,5 +1,5 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { db } from '../firebase/firebase';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Carousel, Col, Row } from "antd";
@@ -8,39 +8,23 @@ export const Products = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
 
   const fetchProducts = async () => {
-    setLoading(true); // Set loading to true
-    setError(null); // Reset error
     const type = queryParams.get("type");
     const category = queryParams.get("category");
     if (category && type) {
-      try {
-        const productCollection = collection(db, "products");
-        const q = query(productCollection, where("type", "==", type), where("category", "==", category));
-        const productSnapshot = await getDocs(q);
-        const productList = productSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setProducts(productList);
-      } catch (err) {
-        console.error("Error fetching products: ", err);
-        setError("Failed to load products."); // Set error message
-      } finally {
-        setLoading(false); // Set loading to false
-      }
-    } else {
-      setLoading(false); // Set loading to false if no category or type
+      const productCollection = collection(db, "products");
+      const q = query(productCollection, where("type", "==", type), where("category", "==", category));
+      const productSnapshot = await getDocs(q);
+      const productList = productSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      return productList;
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [location.search]);
+  const { data: products, loading, error } = useQuery({ queryKey: ['products', location.search], queryFn: fetchProducts })
 
   const handleClick = (data) => () => {
     navigate(`/products/detail?id=${data.id}`);

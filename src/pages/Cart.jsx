@@ -1,39 +1,23 @@
-import { useEffect, useState } from 'react';
 import { getCartData, updateCartItem, removeCartItem, updateCart } from "../services/cartService";
 import { Button, Row, Col, Collapse } from 'antd';
 import useWindowSize from '../hooks/useBreakpoints';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import RazorpayPayment from '../customComponents/RazorpayPayment';
 import { calculateTotals } from '../utils/calculateTotals';
-
+import { useQuery } from '@tanstack/react-query';
 
 export const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
   const size = useWindowSize(); // Get screen size using the custom hook
-
-  const { Panel } = Collapse;
-
-  const fetchCartItems = async () => {
-    try {
-      const cartData = await getCartData();
-      setCartItems(cartData)
-    } catch (error) {
-      console.error("Error fetching cart items: ", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCartItems()
-  }, []);
+  const { data: cartItems, refetch } = useQuery({ queryKey: ['cart'], queryFn: getCartData })
 
   const changeQuantity = async (item, quantity) => {
     await updateCartItem(item, quantity);
-    await fetchCartItems();
+    refetch()
   };
 
   const handleRemove = async (item) => {
     await removeCartItem(item);
-    await fetchCartItems();
+    refetch()
   };
 
   const price = () => calculateTotals(cartItems?.items)?.price;

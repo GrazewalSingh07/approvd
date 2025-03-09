@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ConfigProvider
         theme={{
 
-          algorithm: theme.darkAlgorithm,
+          algorithm: theme.defaultAlgorithm,
 
         }}
       >
