@@ -4,9 +4,9 @@ import { auth, db } from '../firebase/firebase';
 import { useLocation } from 'react-router-dom';
 import { Button, Carousel, Divider, Flex, Space } from "antd";
 import { QuantityCounter } from "../customComponents/QuantityCounter";
-import { addToCart } from "../services/cartService";
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../services/cart.service";
 
 export const ProductDetail = () => {
   const location = useLocation();

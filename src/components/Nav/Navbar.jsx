@@ -6,8 +6,9 @@ import { CiMenuBurger } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/authContext';
 import { doSignOut } from '../../firebase/auth';
-import { getCartData } from '../../services/cartService';
 import { useQuery } from '@tanstack/react-query';
+import { getCartData } from '../../services/cart.service';
+import toast from 'react-hot-toast';
 
 export const Navbar = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -39,16 +40,10 @@ export const Navbar = () => {
   const handleLogout = () => {
     setOpen(false);
     doSignOut()
-    messageApi.open({
-      type: 'success',
-      content: 'Logged out',
-      className: 'text-white',
-
-    });
+    toast.success('Logged out');
   }
   return (
     <div className='bg-black py-2 px-4'>
-      {contextHolder}
       <Flex justify='space-between' >
         <Space onClick={() => navigate("/")} className='md:hidden max-md:visible'>
           <img className=' w-12' src="/logo-preview.png" />

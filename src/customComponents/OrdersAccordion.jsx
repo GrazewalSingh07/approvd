@@ -1,4 +1,7 @@
+import React from 'react';
 import { Collapse, Table } from 'antd';
+import { formattedPrice } from '../utils/formattedPrice';
+import { format } from 'date-fns';
 
 export const OrdersAccordion = ({ filteredOrders }) => {
   const columns = [
@@ -12,7 +15,7 @@ export const OrdersAccordion = ({ filteredOrders }) => {
       dataIndex: 'price',
       key: 'price',
       align: 'right',
-      render: (price) => `$${price.toFixed(2)}`,
+      render: (price) => `${formattedPrice(price)}`,
     },
     {
       title: 'Qty',
@@ -25,7 +28,7 @@ export const OrdersAccordion = ({ filteredOrders }) => {
       dataIndex: 'subtotal',
       key: 'subtotal',
       align: 'right',
-      render: (_, record) => `$${(record.price * record.quantity).toFixed(2)}`,
+      render: (_, record) => `${formattedPrice(record.totalPrice * record.quantity)}`,
     },
   ];
 
@@ -39,46 +42,47 @@ export const OrdersAccordion = ({ filteredOrders }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const formatDate = (date) => {
+    const createdAtDate = new Date(date?.seconds * 1000 + date?.nanoseconds / 1000000);
+    return format(createdAtDate, "dd MMM yyyy");
   };
 
-
-  const items = filteredOrders.map(order => ({
+  const items = filteredOrders?.map(order => ({
     key: order.id.toString(),
     label: (
-      <div
-        className="cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between"
-      >
-        <div className="mb-2 sm:mb-0">
-          <span className="font-medium text-gray-900">#{order.id}</span>
-          <p className="text-sm text-gray-500">{formatDate(order.date)}</p>
-        </div>
+      <>
+        <div
+          className="cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between"
+        >
+          <div className="mb-2 sm:mb-0">
+            <span className="font-medium text-gray-900">#{order.id}</span>
+            <p className="text-sm text-gray-500">{formatDate(order.createdAt)}</p>
+          </div>
 
-        <div className="mb-2 sm:mb-0">
-          <p className="font-medium text-gray-900">{order.customer}</p>
-          <p className="text-sm text-gray-500">{order.email}</p>
-        </div>
+          <div className="mb-2 sm:mb-0">
+            <p className="font-medium text-gray-900">{order.customer}</p>
+            <p className="text-sm text-gray-500">{order.email}</p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-gray-900 font-medium">${order.total.toFixed(2)}</span>
-          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
-            {order.status}
-          </span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span className="text-gray-900 font-medium">{formattedPrice(order.totalPrice)}</span>
+            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
+              {order.status}
+            </span>
+          </div>
         </div>
-      </div>
+      </>
     ),
     children: (
       <Table
-        dataSource={order.items.map(item => ({ ...item, key: item.name }))}
+        dataSource={order.items.map(item => ({ ...item, key: item.id }))}
         columns={columns}
         pagination={false}
       />
     ),
   }));
 
-  if (filteredOrders.length > 0) {
+  if (filteredOrders?.length > 0) {
     return <Collapse items={items} />;
   } else {
     return (

@@ -1,63 +1,13 @@
 import { Select, Input } from 'antd';
 import React, { useState } from 'react';
 import { OrdersAccordion } from '../customComponents/OrdersAccordion';
+import { getUserOrders } from '../services/orders.service';
+import { useQuery } from '@tanstack/react-query';
 
 const { Search } = Input;
 
 export const Orders = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: '1001',
-      date: '2025-03-05',
-      customer: 'John Doe',
-      email: 'john.doe@example.com',
-      items: [
-        { name: 'Wireless Headphones', price: 89.99, quantity: 1 },
-        { name: 'Phone Case', price: 24.99, quantity: 1 }
-      ],
-      total: 114.98,
-      status: 'delivered',
-      paymentMethod: 'Credit Card'
-    },
-    {
-      id: '1002',
-      date: '2025-03-07',
-      customer: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      items: [
-        { name: 'Smart Watch', price: 199.99, quantity: 1 }
-      ],
-      total: 199.99,
-      status: 'processing',
-      paymentMethod: 'PayPal'
-    },
-    {
-      id: '1003',
-      date: '2025-03-08',
-      customer: 'Robert Johnson',
-      email: 'robert.j@example.com',
-      items: [
-        { name: 'Laptop Sleeve', price: 34.99, quantity: 1 },
-        { name: 'USB-C Cable', price: 12.99, quantity: 2 },
-        { name: 'Wireless Mouse', price: 45.99, quantity: 1 }
-      ],
-      total: 106.96,
-      status: 'shipped',
-      paymentMethod: 'Credit Card'
-    },
-    {
-      id: '1004',
-      date: '2025-03-09',
-      customer: 'Emily Davis',
-      email: 'emily.d@example.com',
-      items: [
-        { name: 'Bluetooth Speaker', price: 79.99, quantity: 1 }
-      ],
-      total: 79.99,
-      status: 'pending',
-      paymentMethod: 'Bank Transfer'
-    }
-  ]);
+  const { data: orders, isLoading } = useQuery({ queryKey: ['orders'], queryFn: getUserOrders })
 
   // State for filters and search
   const [searchTerm, setSearchTerm] = useState('');
@@ -83,7 +33,7 @@ export const Orders = () => {
   };
 
   // Filter orders based on search term and status filter
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders?.filter(order => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||

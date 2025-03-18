@@ -1,10 +1,11 @@
-import { getCartData, updateCartItem, removeCartItem, updateCart } from "../services/cartService";
+import React from 'react';
 import { Button, Row, Col, Collapse } from 'antd';
 import useWindowSize from '../hooks/useBreakpoints';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import RazorpayPayment from '../customComponents/RazorpayPayment';
 import { calculateTotals } from '../utils/calculateTotals';
 import { useQuery } from '@tanstack/react-query';
+import { getCartData, updateCartItem, removeCartItem } from "../services/cart.service";
 
 export const Cart = () => {
   const size = useWindowSize(); // Get screen size using the custom hook

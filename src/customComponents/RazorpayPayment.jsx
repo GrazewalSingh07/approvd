@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'antd';
 import toast from 'react-hot-toast';
-import { updateCart } from "../services/cartService";
 import { getCurrentUser } from "../services/userAuth";
 import { useNavigate } from 'react-router-dom';
+import { updateCart } from '../services/cart.service';
 
 const RazorpayPayment = ({ totalAmount }) => {
   const navigate = useNavigate()
@@ -39,7 +39,7 @@ const RazorpayPayment = ({ totalAmount }) => {
 
     try {
       const result = await fetch(
-        'http://127.0.0.1:5001/approvd-10fe6/us-central1/createOrder', {
+        'http://127.0.0.1:5001/approvd-10fe6/us-central1/api/razorpay/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const RazorpayPayment = ({ totalAmount }) => {
         order_id, // This is the order ID created by Razorpay
         handler: async function(response) {
           await updateCart(response)
-          fetch('http://127.0.0.1:5001/approvd-10fe6/us-central1/verifyPayment', {
+          fetch('http://127.0.0.1:5001/approvd-10fe6/us-central1/api/razorpay/verify-payment', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
