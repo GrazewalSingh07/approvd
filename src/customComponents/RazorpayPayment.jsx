@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "antd";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "../services/userAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { updateCart } from "../services/cart.service";
 
 const firebaseRazorpayBaseUrl = import.meta.env.VITE_FIREBASE_API_BASEURL;
