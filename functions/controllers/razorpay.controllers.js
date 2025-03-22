@@ -1,9 +1,8 @@
 import { generateReceipt } from "../utils/generateReceipt.js";
 import { moveCartToOrders } from "./moveOrder.controllers.js";
 import Razorpay from "razorpay";
-import crypto from 'node:crypto';
+import crypto from "node:crypto";
 import { db } from "../index.js";
-
 
 const rzp_secret = process.env.RAZORPAY_TEST_KEY_SECRET;
 const razorpay = new Razorpay({
@@ -32,7 +31,7 @@ export const createRazorpayOrder = async (req, res) => {
     console.error("Create order error:", error);
     res.status(500).json({ error: "Failed to create Razorpay order" });
   }
-}
+};
 
 export const verifyRazorpayPayment = async (req, res) => {
   try {
@@ -54,10 +53,12 @@ export const verifyRazorpayPayment = async (req, res) => {
       .update(payload)
       .digest("hex");
 
-    if (!crypto.timingSafeEqual(
-      Buffer.from(generatedSignature, "utf8"),
-      Buffer.from(razorpay_signature, "utf8")
-    )) {
+    if (
+      !crypto.timingSafeEqual(
+        Buffer.from(generatedSignature, "utf8"),
+        Buffer.from(razorpay_signature, "utf8"),
+      )
+    ) {
       return res.status(401).json({ message: "Invalid signature" });
     }
 
@@ -69,4 +70,4 @@ export const verifyRazorpayPayment = async (req, res) => {
     console.error("Verify payment error:", error);
     res.status(500).json({ error: "Payment verification failed" });
   }
-}
+};

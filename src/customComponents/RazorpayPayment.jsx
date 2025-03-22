@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
-import { Button } from 'antd';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { Button } from "antd";
+import toast from "react-hot-toast";
 import { getCurrentUser } from "../services/userAuth";
-import { useNavigate } from 'react-router-dom';
-import { updateCart } from '../services/cart.service';
+import { useNavigate } from "react-router-dom";
+import { updateCart } from "../services/cart.service";
+
+const firebaseRazorpayBaseUrl = import.meta.env.VITE_FIREBASE_API_BASEURL;
 
 const RazorpayPayment = ({ totalAmount }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => {
         resolve(true);
       };
@@ -30,7 +32,7 @@ const RazorpayPayment = ({ totalAmount }) => {
 
     if (!scriptLoaded) {
       toast.dismiss();
-      toast.error('Failed to load Razorpay SDK. Please check your connection.');
+      toast.error("Failed to load Razorpay SDK. Please check your connection.");
       setLoading(false);
       return;
     }
@@ -39,60 +41,60 @@ const RazorpayPayment = ({ totalAmount }) => {
 
     try {
       const result = await fetch(
-        'http://127.0.0.1:5001/approvd-10fe6/us-central1/api/razorpay/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+        firebaseRazorpayBaseUrl + "/razorpay/create-order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ amount: totalAmount }),
         },
-        body: JSON.stringify({ amount: totalAmount }),
-      }
-      )
+      );
       const { amount, id: order_id, currency } = await result.json();
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
         amount: amount.toString(),
         currency,
-        name: 'Approvd',
-        description: 'Test Transaction',
+        name: "Approvd",
+        description: "Test Transaction",
         order_id, // This is the order ID created by Razorpay
-        handler: async function(response) {
-          await updateCart(response)
-          fetch('http://127.0.0.1:5001/approvd-10fe6/us-central1/api/razorpay/verify-payment', {
-            method: 'POST',
+        handler: async function (response) {
+          await updateCart(response);
+          fetch(firebaseRazorpayBaseUrl + "/razorpay/verify-payment", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(response),
           }).then((res) => {
             if (res.status === 200) {
-              toast.success('Payment verified successfully');
-              navigate('/')
+              toast.success("Payment verified successfully");
+              navigate("/");
             } else {
-              toast.error('Payment verification failed');
+              toast.error("Payment verification failed");
             }
           });
         },
         prefill: {
-          name: 'Customer Name',
-          email: 'test@example.com',
-          contact: '9999999999',
+          name: "Customer Name",
+          email: "test@example.com",
+          contact: "9999999999",
         },
         theme: {
-          color: '#F37254',
+          color: "#F37254",
         },
       };
 
       // open the payment window
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
-
     } catch (error) {
-      console.log(error, 'error');
+      console.log(error, "error");
       toast.dismiss();
-      toast.error('Server error. Please try again later.');
+      toast.error("Server error. Please try again later.");
       return;
     } finally {
       setLoading(false);

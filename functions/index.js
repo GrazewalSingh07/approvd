@@ -2,8 +2,9 @@ import functions from "firebase-functions";
 import admin from "firebase-admin";
 import express from "express";
 import cors from "cors";
-import 'dotenv/config';
+import "dotenv/config";
 import razorpayRoute from "./routes/razorpay.routes.js";
+import shiprocketRoute from "./routes/shiprocket.routes.js";
 import { authenticate } from "./middlewares/auth.js";
 
 admin.initializeApp();
@@ -15,7 +16,8 @@ app.use(cors({ origin: true }));
 app.use(express.json());
 app.use(authenticate);
 
-app.use('/razorpay', razorpayRoute);
+app.use("/razorpay", razorpayRoute);
+app.use("/shiprocket", shiprocketRoute);
 
 export const db = admin.firestore();
 export const api = functions.https.onRequest(app);
