@@ -46,6 +46,16 @@ export const moveCartToOrders = async (userId, paymentId) => {
   console.log("Write operation completed at:", writeDate.toLocaleString());
 
   const orderId = orderRef.id;
+  // modify the order for the shipping data
+  const order_items = cartData.items.map((item) => ({
+    name: item.name,
+    sku: `APR-${item.id}`,
+    units: item.quantity,
+    selling_price: item.price,
+    discount: 0,
+    tax: 0,
+    hsn: item.hsn,
+  }));
 
   const orderData = {
     order_id: orderId,
@@ -64,17 +74,7 @@ export const moveCartToOrders = async (userId, paymentId) => {
     billing_email: "naruto@uzumaki.com",
     billing_phone: "9876543210",
     shipping_is_billing: true,
-    order_items: [
-      {
-        name: "Kunai",
-        sku: "chakra123",
-        units: 10,
-        selling_price: 900,
-        discount: 0,
-        tax: 0,
-        hsn: "441122",
-      },
-    ],
+    order_items,
     payment_method: "Prepaid",
     shipping_charges: 0,
     giftwrap_charges: 0,
