@@ -4,12 +4,16 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:react/jsx-runtime",
+    "plugin:react/jsx-runtime", // Ensure this is included
     "plugin:react-hooks/recommended",
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-  settings: { react: { version: "18.2" } },
+  settings: {
+    react: {
+      version: "19.0.0", // Ensure this matches your React version
+    },
+  },
   plugins: ["react-refresh"],
   rules: {
     "react/jsx-no-target-blank": "off",
@@ -17,5 +21,7 @@ module.exports = {
       "warn",
       { allowConstantExport: true },
     ],
+    "react/jsx-uses-react": "off",
+    "react/jsx-uses-vars": "error",
   },
 };

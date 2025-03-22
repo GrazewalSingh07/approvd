@@ -1,5 +1,5 @@
 import { Select, Input } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import { OrdersAccordion } from "../customComponents/OrdersAccordion";
 import { getUserOrders } from "../services/orders.service";
 import { useQuery } from "@tanstack/react-query";
