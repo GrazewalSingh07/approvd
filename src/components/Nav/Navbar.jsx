@@ -1,27 +1,39 @@
-import { Badge, Button, Drawer, Dropdown, Flex, Space, Tooltip, message } from 'antd'
-import React, { useState } from 'react'
-import { IoCartOutline, IoMailOutline } from 'react-icons/io5';
-import { MdAccountCircle } from 'react-icons/md';
+import {
+  Badge,
+  Button,
+  Drawer,
+  Dropdown,
+  Flex,
+  Space,
+  Tooltip,
+  message,
+} from "antd";
+import React, { useState } from "react";
+import { IoCartOutline, IoMailOutline } from "react-icons/io5";
+import { MdAccountCircle } from "react-icons/md";
 import { CiMenuBurger } from "react-icons/ci";
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/authContext';
-import { doSignOut } from '../../firebase/auth';
-import { useQuery } from '@tanstack/react-query';
-import { getCartData } from '../../services/cart.service';
-import toast from 'react-hot-toast';
+import { useNavigate } from "react-router";
+import { useAuth } from "../../contexts/authContext";
+import { doSignOut } from "../../firebase/auth";
+import { useQuery } from "@tanstack/react-query";
+import { getCartData } from "../../services/cart.service";
+import toast from "react-hot-toast";
 
 export const Navbar = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [open, setOpen] = useState(false);
-  const [placement, setPlacement] = useState('right');
-  const { userLoggedIn } = useAuth()
+  const [placement, setPlacement] = useState("right");
+  const { userLoggedIn } = useAuth();
 
-  const { data: cartItems } = useQuery({ queryKey: ['cart'], queryFn: getCartData })
+  const { data: cartItems } = useQuery({
+    queryKey: ["cart"],
+    queryFn: getCartData,
+  });
 
   const showDrawer = () => {
     setOpen(true);
   };
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onChange = (e) => {
     setPlacement(e.target.value);
   };
@@ -30,129 +42,225 @@ export const Navbar = () => {
   };
   const handleCart = () => {
     setOpen(false);
-    navigate("/cart")
-  }
+    navigate("/cart");
+  };
 
   const handleLogin = (e) => {
     setOpen(false);
-    navigate("/login")
-  }
+    navigate("/login");
+  };
   const handleLogout = () => {
     setOpen(false);
-    doSignOut()
-    toast.success('Logged out');
-  }
+    doSignOut();
+    toast.success("Logged out");
+  };
   return (
-    <div className='bg-black py-2 px-4'>
-      <Flex justify='space-between' >
-        <Space onClick={() => navigate("/")} className='md:hidden max-md:visible'>
-          <img className=' w-12' src="/logo-preview.png" />
+    <div className="bg-black py-2 px-4">
+      <Flex justify="space-between">
+        <Space
+          onClick={() => navigate("/")}
+          className="md:hidden max-md:visible"
+        >
+          <img className=" w-12" src="/logo-preview.png" />
         </Space>
-        <Space >
+        <Space>
           <Dropdown
-            align={'center'}
+            align={"center"}
             dropdownRender={() => (
-              <div style={{ width: '100vw', left: 0, position: 'relative', top: 0 }}>
-                <div style={{ backgroundColor: 'white', padding: '10px 20px' }}>
-                  <Button>
-                    hii
-                  </Button>
+              <div
+                style={{
+                  width: "100vw",
+                  left: 0,
+                  position: "relative",
+                  top: 0,
+                }}
+              >
+                <div style={{ backgroundColor: "white", padding: "10px 20px" }}>
+                  <Button>hii</Button>
                 </div>
               </div>
             )}
-            trigger={['hover']}
+            trigger={["hover"]}
           >
-
             <a>
               <Space>
-                <p onClick={(e) => e.preventDefault()} className='hover:underline text-white pr-4 underline-offset-[6px] max-sm:text-[12px] text-lg'>
+                <p
+                  onClick={(e) => e.preventDefault()}
+                  className="hover:underline text-white pr-4 underline-offset-[6px] max-sm:text-[12px] text-lg"
+                >
                   Shop by category
                 </p>
               </Space>
             </a>
           </Dropdown>
           <Dropdown
-            align={'center'}
+            align={"center"}
             dropdownRender={(menu) => (
-              <div style={{ width: '100vw', left: 0, position: 'relative', top: 0 }}>
-                <div style={{ backgroundColor: 'white', padding: '10px 20px' }}>{menu}</div>
+              <div
+                style={{
+                  width: "100vw",
+                  left: 0,
+                  position: "relative",
+                  top: 0,
+                }}
+              >
+                <div style={{ backgroundColor: "white", padding: "10px 20px" }}>
+                  {menu}
+                </div>
               </div>
             )}
-            trigger={['hover']}
+            trigger={["hover"]}
           >
             <a>
               <Space>
-                <p onClick={(e) => e.preventDefault()} className='hover:underline  text-white max-sm:text-[12px] underline-offset-[6px]'>
+                <p
+                  onClick={(e) => e.preventDefault()}
+                  className="hover:underline  text-white max-sm:text-[12px] underline-offset-[6px]"
+                >
                   Shop by collection
                 </p>
               </Space>
             </a>
           </Dropdown>
-
         </Space>
-        <Space onClick={() => navigate("/")} className='md:visible max-md:hidden  cursor-pointer'>
-          <img className=' w-32' src="/logo-preview.png" />
-        </Space>
-
-        <Space className='visible max-md:hidden'>
-          <Tooltip className='cursor-pointer' placement="bottomLeft" title={'Contact us'} >
-            <IoMailOutline color='white' size={32} />
-
-          </Tooltip>
-          {userLoggedIn && <Badge count={cartItems?.items?.length}><Tooltip onClick={() => navigate("/cart")} className='cursor-pointer' placement="bottomLeft" title={'My cart'} >
-            <IoCartOutline color='white' size={32} />
-          </Tooltip></Badge>}
-
-          {!userLoggedIn && <Tooltip onClick={() => navigate("/login")} className='cursor-pointer' placement="bottomLeft" title={'Login/Register'} >
-            <MdAccountCircle color='white' size={32} />
-          </Tooltip>}
-          {userLoggedIn && <Tooltip onClick={handleLogout} className='cursor-pointer' placement="bottomLeft" title={'Logout'} >   <MdAccountCircle color='white' size={32} />
-          </Tooltip>
-          }
-
-
+        <Space
+          onClick={() => navigate("/")}
+          className="md:visible max-md:hidden  cursor-pointer"
+        >
+          <img className=" w-32" src="/logo-preview.png" />
         </Space>
 
+        <div className="hidden md:flex">
+          <Flex gap={6} align="center">
+            <Tooltip placement="bottom" title="Contact us">
+              <span className="cursor-pointer">
+                <IoMailOutline color="white" size={26} />
+              </span>
+            </Tooltip>
 
-        <Space className='md:hidden visible'>
-          <Button size='large' type="text" onClick={showDrawer}>
-            <CiMenuBurger color='white' />
+            {userLoggedIn && (
+              <Tooltip placement="bottom" title="My cart">
+                <Badge count={cartItems?.items?.length} offset={[-5, 5]}>
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => navigate("/cart")}
+                  >
+                    <IoCartOutline color="white" size={26} />
+                  </span>
+                </Badge>
+              </Tooltip>
+            )}
+
+            {!userLoggedIn ? (
+              <Tooltip placement="bottom" title="Login/Register">
+                <span
+                  className="cursor-pointer"
+                  onClick={() => navigate("/login")}
+                >
+                  <MdAccountCircle color="white" size={26} />
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip placement="bottom" title="Logout">
+                <span className="cursor-pointer" onClick={handleLogout}>
+                  <MdAccountCircle color="white" size={26} />
+                </span>
+              </Tooltip>
+            )}
+          </Flex>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <Button
+            type="text"
+            onClick={showDrawer}
+            className="p-0 flex items-center justify-center"
+          >
+            <CiMenuBurger color="white" size={24} />
           </Button>
-        </Space>
-
+        </div>
       </Flex>
+      {/* Mobile Drawer */}
       <Drawer
-        title="My Menu"
+        title="Menu"
         placement={placement}
-        width={500}
+        width={300}
         onClose={onClose}
         open={open}
-
+        className="p-0"
       >
+        <Flex vertical gap={4} className="p-0">
+          <Button
+            type="text"
+            onClick={() => {
+              navigate("/");
+              onClose();
+            }}
+            className="text-left h-auto py-3 flex items-center"
+          >
+            <span className="text-lg">Home</span>
+          </Button>
 
-        <Space >
-          <Flex gap={8} vertical>
+          <Button
+            type="text"
+            className="text-left h-auto py-3 flex items-center"
+          >
+            <span className="text-lg">Shop by category</span>
+          </Button>
 
-            <Flex align='center' gap={4}> <IoMailOutline size={32} /> <span >Contact Us</span>
-            </Flex>
+          <Button
+            type="text"
+            className="text-left h-auto py-3 flex items-center"
+          >
+            <span className="text-lg">Shop by collection</span>
+          </Button>
 
-            {userLoggedIn && <Flex align='center' onClick={handleCart} gap={4}>  <IoCartOutline size={32} /><span >Cart</span>
-            </Flex>}
+          <div className="h-px bg-gray-200 my-2"></div>
 
+          <Button
+            type="text"
+            className="text-left h-auto py-3 flex items-center"
+            icon={<IoMailOutline size={20} className="mr-2" />}
+          >
+            <span className="text-lg">Contact Us</span>
+          </Button>
 
+          {userLoggedIn && (
+            <Button
+              type="text"
+              onClick={handleCart}
+              className="text-left h-auto py-3 flex items-center"
+              icon={<IoCartOutline size={20} className="mr-2" />}
+            >
+              <span className="text-lg">My Cart</span>
+              {cartItems?.items?.length > 0 && (
+                <Badge count={cartItems.items.length} className="ml-2" />
+              )}
+            </Button>
+          )}
 
-            {!userLoggedIn && <Flex align='center' onClick={handleLogin} gap={4}>    <MdAccountCircle size={32} /><span >Login / Register</span>
-            </Flex>
-
-            }
-            {userLoggedIn && <Flex align='center' onClick={handleLogout} gap={4}>    <MdAccountCircle size={32} /><span >Logout</span>
-            </Flex>
-
-            }
-
-          </Flex>
-        </Space>
+          {!userLoggedIn ? (
+            <Button
+              type="text"
+              onClick={handleLogin}
+              className="text-left h-auto py-3 flex items-center"
+              icon={<MdAccountCircle size={20} className="mr-2" />}
+            >
+              <span className="text-lg">Login / Register</span>
+            </Button>
+          ) : (
+            <Button
+              type="text"
+              onClick={handleLogout}
+              className="text-left h-auto py-3 flex items-center danger"
+              icon={<MdAccountCircle size={20} className="mr-2" />}
+            >
+              <span className="text-lg">Logout</span>
+            </Button>
+          )}
+        </Flex>
       </Drawer>
     </div>
-  )
-}
+  );
+};

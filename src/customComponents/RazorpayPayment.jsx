@@ -103,11 +103,17 @@ const RazorpayPayment = ({ totalAmount }) => {
 
   return (
     <>
-      <div>
-        <Button onClick={handlePayment} loading={loading}>
-          Proceed to payment | Total Price: ₹{totalAmount}
-        </Button>
-      </div>
+      <Button
+        type="primary"
+        size="large"
+        block
+        loading={loading}
+        onClick={handlePayment}
+        color="default"
+        variant="solid"
+      >
+        Pay Now
+      </Button>
     </>
   );
 };
