@@ -1,4 +1,4 @@
-import { Button, InputNumber } from 'antd'; // Import Ant Design components
+import { Button, InputNumber } from "antd"; // Import Ant Design components
 
 export const QuantityCounter = ({ quantity, setQuantity }) => {
   const increment = () => {
@@ -22,8 +22,8 @@ export const QuantityCounter = ({ quantity, setQuantity }) => {
         min={1}
         value={quantity}
         readOnly={true}
-        className='text-center'
-        style={{ width: '40px' }} // Adjust width as needed
+        className="text-center"
+        style={{ width: "40px" }} // Adjust width as needed
       />
       <Button onClick={increment} type="default">
         +
@@ -31,5 +31,3 @@ export const QuantityCounter = ({ quantity, setQuantity }) => {
     </div>
   );
 };
-
-
