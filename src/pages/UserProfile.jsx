@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Tabs,
   Card,
@@ -51,26 +51,27 @@ export const Profile = () => {
   const {
     data: userData,
     isLoading: userLoading,
+    isSuccess: userSuccess,
     error: userError,
   } = useQuery({
     queryKey: ["user", currentUser?.uid],
     queryFn: () => getUserData(currentUser?.uid),
     enabled: !!userLoggedIn && !!currentUser?.uid,
-    onSuccess: (data) => {
-      console.log(data, "++");
-      // Set form values when data is loaded
-      console.log("data", data);
-      profileForm.setFieldsValue({
-        displayName: data.displayName || "",
-        email: data.email || user?.email || "",
-        phone: data.phone || "",
-        address: data.address || "",
-        city: data.city || "",
-        state: data.state || "",
-        pincode: data.pincode || "",
-      });
-    },
   });
+
+  useEffect(() => {
+    if (userSuccess) {
+      profileForm.setFieldsValue({
+        displayName: userData.displayName || "",
+        email: userData.email || user?.email || "",
+        phone: userData.phone || "",
+        address: userData.address || "",
+        city: userData.city || "",
+        state: userData.state || "",
+        pincode: userData.pincode || "",
+      });
+    }
+  }, [userSuccess]);
 
   // Fetch orders with React Query
   const {
@@ -491,7 +492,7 @@ export const Profile = () => {
                         className="border rounded-lg p-4 mb-4 hover:shadow-md transition-shadow"
                         key={order.id}
                       >
-                        <div className="w-full">
+                        <div className="w-full px-4">
                           <div className="flex justify-between items-center mb-2">
                             <div>
                               <Text strong>Order #{order.id.slice(0, 8)}</Text>

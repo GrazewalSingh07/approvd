@@ -5,6 +5,7 @@ import {
   doSignInWithGoogle,
 } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
+import { ForgotPassword } from "./ForgotPassword";
 import { message } from "antd";
 
 const Login = () => {
@@ -14,6 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -93,6 +95,16 @@ const Login = () => {
               />
             </div>
 
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setShowPasswordReset(true)}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+
             {errorMessage && (
               <span className="text-red-600 font-bold">{errorMessage}</span>
             )}
@@ -160,6 +172,9 @@ const Login = () => {
           </button>
         </div>
       </main>
+      {showPasswordReset && (
+        <ForgotPassword onClose={() => setShowPasswordReset(false)} />
+      )}
     </div>
   );
 };
