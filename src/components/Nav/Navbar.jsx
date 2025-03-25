@@ -51,8 +51,7 @@ export const Navbar = () => {
   };
   const handleLogout = () => {
     setOpen(false);
-    doSignOut();
-    toast.success("Logged out");
+    navigate("/profile");
   };
   return (
     <div className="bg-black py-2 px-4">
@@ -161,7 +160,7 @@ export const Navbar = () => {
                 </span>
               </Tooltip>
             ) : (
-              <Tooltip placement="bottom" title="Logout">
+              <Tooltip placement="bottom" title="Profile">
                 <span className="cursor-pointer" onClick={handleLogout}>
                   <MdAccountCircle color="white" size={26} />
                 </span>
