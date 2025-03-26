@@ -7,15 +7,33 @@ import {
   ShoppingOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+import { getUserData, updateUserDetails } from "../services/user.service";
+import { useAuth } from "../contexts/authContext";
+import { useQuery } from "@tanstack/react-query";
 
 export const Address = () => {
   const { Step } = Steps;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { userLoggedIn, currentUser } = useAuth();
+
+  const {
+    data: userData,
+    isLoading: userLoading,
+    isSuccess: userSuccess,
+    error: userError,
+  } = useQuery({
+    queryKey: ["user", currentUser?.uid],
+    queryFn: () => getUserData(currentUser?.uid),
+    enabled: !!userLoggedIn && !!currentUser?.uid,
+  });
 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
+      if (userLoggedIn) {
+        await updateUserDetails(currentUser.uid, values);
+      }
       // Save the billing information to your backend
       // await saveBillingInfo(values);
       // Show success message or redirect
@@ -26,20 +44,6 @@ export const Address = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Example initial values
-  const initialValues = {
-    billing_customer_name: "Naruto",
-    billing_last_name: "Uzumaki",
-    billing_address: "House 221B, Leaf Village",
-    billing_address_2: "Near Hokage House",
-    billing_city: "New Delhi",
-    billing_pincode: "110002",
-    billing_state: "Delhi",
-    billing_country: "India",
-    billing_email: "naruto@uzumaki.com",
-    billing_phone: "9876543210",
   };
 
   return (
@@ -53,7 +57,7 @@ export const Address = () => {
       </div>
       <AddressForm
         onSubmit={handleSubmit}
-        initialValues={initialValues}
+        initialValues={userData}
         loading={loading}
       />
     </div>

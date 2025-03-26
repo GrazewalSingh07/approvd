@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   Row,
@@ -26,6 +26,8 @@ import { getCartData } from "../services/cart.service";
 import { calculateTotals } from "../utils/calculateTotals";
 import { formattedPrice } from "../utils/formattedPrice";
 import RazorpayPayment from "../customComponents/RazorpayPayment";
+import { getUserData } from "../services/user.service";
+import { useAuth } from "../contexts/authContext";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -33,6 +35,13 @@ const { Step } = Steps;
 export const OrderSummary = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(2);
+  const { userLoggedIn, currentUser } = useAuth();
+
+  const { data: userData } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserData(currentUser?.uid),
+    enabled: userLoggedIn && !!currentUser?.uid,
+  });
 
   // Fetch cart data
   const {
@@ -93,7 +102,7 @@ export const OrderSummary = () => {
         <Col xs={24} lg={16}>
           <Card
             title={<Title level={4}>Order Summary</Title>}
-            bordered={false}
+            variant="borderless"
             className="mb-4"
           >
             <List
@@ -130,54 +139,46 @@ export const OrderSummary = () => {
             />
           </Card>
 
-          <Card
-            title={<Title level={4}>Shipping Information</Title>}
-            bordered={false}
-            className="mb-4"
-          >
-            {cartData.shippingAddress ? (
+          {userData ? (
+            <Card
+              title={<Title level={4}>Shipping Information</Title>}
+              variant="borderless"
+              className="mb-4"
+            >
               <div>
                 <Text strong>
-                  {cartData.shippingAddress.billing_customer_name}{" "}
-                  {cartData.shippingAddress.billing_last_name}
+                  {userData?.billing_customer_name}{" "}
+                  {userData?.billing_last_name}
                 </Text>
                 <br />
-                <Text>{cartData.shippingAddress.billing_address}</Text>
-                {cartData.shippingAddress.billing_address_2 && (
+                <Text>{userData?.billing_address}</Text>
+                {userData?.billing_address_2 && (
                   <>
                     <br />
-                    <Text>{cartData.shippingAddress.billing_address_2}</Text>
+                    <Text>{userData?.billing_address_2}</Text>
                   </>
                 )}
                 <br />
                 <Text>
-                  {cartData.shippingAddress.billing_city},{" "}
-                  {cartData.shippingAddress.billing_state}{" "}
-                  {cartData.shippingAddress.billing_pincode}
+                  {userData?.billing_city}, {userData?.billing_state}{" "}
+                  {userData?.billing_pincode}
                 </Text>
                 <br />
-                <Text>{cartData.shippingAddress.billing_country}</Text>
+                <Text>{userData?.billing_country}</Text>
                 <br />
                 <Text>
-                  Phone: {cartData.shippingAddress.billing_phone} | Email:{" "}
-                  {cartData.shippingAddress.billing_email}
+                  Phone: {userData?.billing_phone} | Email: {userData?.email}
                 </Text>
               </div>
-            ) : (
-              <div>
-                <Text type="warning">
-                  You'll need to provide shipping information at checkout.
-                </Text>
-              </div>
-            )}
-          </Card>
+            </Card>
+          ) : null}
         </Col>
 
         {/* Right Column - Price Summary */}
         <Col xs={24} lg={8}>
           <Card
             title={<Title level={4}>Price Details</Title>}
-            bordered={false}
+            variant="borderless"
             className="sticky top-4"
           >
             <div className="space-y-3">

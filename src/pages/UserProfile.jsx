@@ -73,7 +73,6 @@ export const Profile = () => {
     }
   }, [userSuccess]);
 
-  // Fetch orders with React Query
   const {
     data: orders,
     isLoading: ordersLoading,
@@ -84,7 +83,6 @@ export const Profile = () => {
     enabled: !!userLoggedIn && !!currentUser?.uid,
   });
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (formData) => {
       if (!userLoggedIn || !user) {
