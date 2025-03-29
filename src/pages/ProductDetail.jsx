@@ -460,45 +460,82 @@ export const ProductDetail = () => {
             You May Also Like
           </Title>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {similarProducts?.map((item) =>
-            item.id !== product.id ? (
-              <div
-                onClick={() => similarProductClick(item.id)}
-                key={item.id}
-                className="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-              >
-                <div className="aspect-square overflow-hidden bg-gray-50">
-                  <Carousel
-                    autoplay={false}
-                    className="product-carousel h-[280px]"
-                    dots={{ className: "custom-dots" }}
+
+        {similarProducts && similarProducts.length > 0 ? (
+          <Carousel
+            autoplay
+            slidesToShow={4}
+            slidesToScroll={1}
+            dots={true}
+            responsive={[
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 3,
+                  slidesToScroll: 1,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 2,
+                  slidesToScroll: 1,
+                },
+              },
+              {
+                breakpoint: 480,
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                },
+              },
+            ]}
+            className="similar-products-carousel"
+          >
+            {similarProducts.map((item) =>
+              item.id !== product.id ? (
+                <div key={item.id} className="px-2">
+                  <div
+                    onClick={() => similarProductClick(item.id)}
+                    className="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow h-full"
                   >
-                    {item.images?.map((image, idx) => (
-                      <img
-                        key={idx}
-                        src={image}
-                        alt={item.name}
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ))}
-                  </Carousel>
-                </div>
-                <div className="p-3">
-                  <Text strong className="line-clamp-1">
-                    {item.name}
-                  </Text>
-                  <div className="flex items-center justify-between mt-1">
-                    <Text className="font-semibold">{item.price}</Text>
-                    <Text type="secondary" className="line-through text-sm">
-                      {item.originalPrice}
-                    </Text>
+                    <div className="aspect-square overflow-hidden bg-gray-50">
+                      <Carousel
+                        autoplay={false}
+                        className="product-carousel h-[280px]"
+                        dots={{ className: "custom-dots" }}
+                      >
+                        {item.images?.map((image, idx) => (
+                          <img
+                            key={idx}
+                            src={image}
+                            alt={item.name}
+                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ))}
+                      </Carousel>
+                    </div>
+                    <div className="p-3">
+                      <Text strong className="line-clamp-1">
+                        {item.name}
+                      </Text>
+                      <div className="flex items-center justify-between mt-1">
+                        <Text className="font-semibold">₹{item.price}</Text>
+                        <Text type="secondary" className="line-through text-sm">
+                          ₹{item.originalPrice}
+                        </Text>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : null,
-          )}
-        </div>
+              ) : null,
+            )}
+          </Carousel>
+        ) : (
+          <div className="text-center py-8 border rounded-lg bg-gray-50">
+            <Text type="secondary">No similar products found</Text>
+          </div>
+        )}
       </div>
     </div>
   );
