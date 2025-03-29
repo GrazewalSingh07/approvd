@@ -1,22 +1,21 @@
 import React, { useState } from "react";
-import { Navigate, Link } from "react-router";
+import { Link } from "react-router";
 import {
   doSignInWithEmailAndPassword,
   doSignInWithGoogle,
 } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { ForgotPassword } from "./ForgotPassword";
-import { message } from "antd";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 const Login = () => {
-  const { userLoggedIn } = useAuth();
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!isSigningIn) {
@@ -26,17 +25,15 @@ const Login = () => {
       if (res.error) {
         setIsSigningIn(false);
         setErrorMessage(res.message);
-        messageApi.open({
-          type: "error",
-          content: res.message,
-          className: "text-white",
-        });
+        toast.error(res.message);
       } else {
-        messageApi.open({
-          type: "success",
-          content: "Successfully signed in",
-          className: "text-white",
-        });
+        setIsSigningIn(false);
+        if (!res.user.emailVerified) {
+          toast.error("Please verify your email");
+          return;
+        }
+        toast.success("Successfully signed in");
+        navigate("/");
       }
     }
   };
@@ -53,8 +50,6 @@ const Login = () => {
 
   return (
     <div>
-      {userLoggedIn && <Navigate to={"/"} replace={true} />}
-      {contextHolder}
       <main className="w-full md:h-screen flex self-center place-content-center place-items-center">
         <div className="w-96 text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
           <div className="text-center">
@@ -126,12 +121,12 @@ const Login = () => {
               Sign up
             </Link>
           </p>
-          <div className="flex flex-row text-center w-full">
+          {/* <div className="flex flex-row text-center w-full">
             <div className="border-b-2 mb-2.5 mr-2 w-full"></div>
             <div className="text-sm font-bold w-fit">OR</div>
             <div className="border-b-2 mb-2.5 ml-2 w-full"></div>
-          </div>
-          <button
+          </div> */}
+          {/* <button
             disabled={isSigningIn}
             onClick={(e) => {
               onGoogleSignIn(e);
@@ -169,7 +164,7 @@ const Login = () => {
               </defs>
             </svg>
             {isSigningIn ? "Signing In..." : "Continue with Google"}
-          </button>
+          </button> */}
         </div>
       </main>
       {showPasswordReset && (

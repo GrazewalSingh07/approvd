@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Navigate, Link, useNavigate } from "react-router";
-import { useAuth } from "../../contexts/authContext";
 import { doCreateUserWithEmailAndPassword } from "../../firebase/auth";
 import { message } from "antd";
+import { sendEmailVerification } from "firebase/auth";
+import toast from "react-hot-toast";
 const Register = () => {
   const navigate = useNavigate();
 
@@ -12,26 +13,21 @@ const Register = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { userLoggedIn } = useAuth();
-  const [messageApi, contextHolder] = message.useMessage();
-
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!isRegistering) {
       if (password == confirmPassword) {
         setIsRegistering(true);
-        await doCreateUserWithEmailAndPassword(email, password);
-        messageApi.open({
-          type: "success",
-          content: "Registered successfully",
-          className: "text-white",
-        });
+        const currentUser = await doCreateUserWithEmailAndPassword(
+          email,
+          password,
+        );
+        await sendEmailVerification(currentUser);
+        setIsRegistering(false);
+        toast.success("Email verification sent");
       } else {
-        messageApi.open({
-          type: "warning",
-          content: "passwords must be same",
-          className: "text-white",
-        });
+        setIsRegistering(false);
+        toast.error("passwords must be same");
         setErrorMessage("passwords must be same");
       }
     }
@@ -39,8 +35,6 @@ const Register = () => {
 
   return (
     <>
-      {userLoggedIn && <Navigate to={"/"} replace={true} />}
-
       <main className="w-full  md:h-screen flex self-center place-content-center place-items-center">
         <div className="w-96 text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
           <div className="text-center mb-6">

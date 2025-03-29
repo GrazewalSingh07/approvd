@@ -255,7 +255,7 @@ export const Navbar = () => {
               className="text-left h-auto py-3 flex items-center danger"
               icon={<MdAccountCircle size={20} className="mr-2" />}
             >
-              <span className="text-lg">Logout</span>
+              <span className="text-lg">Profile</span>
             </Button>
           )}
         </Flex>

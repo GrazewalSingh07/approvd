@@ -10,10 +10,18 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 
-export const doCreateUserWithEmailAndPassword = async (email, password, additionalData = {}) => {
+export const doCreateUserWithEmailAndPassword = async (
+  email,
+  password,
+  additionalData = {},
+) => {
   try {
     // Create the user with email and password
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
     const user = userCredential.user;
 
     // Add user information to Firestore
@@ -33,7 +41,11 @@ export const doCreateUserWithEmailAndPassword = async (email, password, addition
 export const doSignInWithEmailAndPassword = async (email, password) => {
   try {
     // Sign in the user
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
     const user = userCredential.user;
 
     // Fetch user data from Firestore
@@ -49,9 +61,7 @@ export const doSignInWithEmailAndPassword = async (email, password) => {
       return { error: true, message: "No user data found." };
     }
   } catch (error) {
-
-    return { error: true, message: 'Invalid credetials' };
-
+    return { error: true, message: "Invalid credetials" };
   }
 };
 
