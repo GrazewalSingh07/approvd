@@ -27,7 +27,7 @@ const data = [
     image: "/categories/gymwear.jpeg"
   }
 ]
-export const ShoeCategory = () => {
+const ShoeCategory = () => {
 
   return (
     <Flex justify='space-evenly' gap={10} className='max-w-[1100px] my-8 mx-auto overflow-scroll cursor-pointer  '>
@@ -46,3 +46,5 @@ export const ShoeCategory = () => {
     </Flex>
   )
 }
+
+export default ShoeCategory;

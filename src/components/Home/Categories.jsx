@@ -4,7 +4,7 @@ import { db } from "../../firebase/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useQuery } from "@tanstack/react-query";
 
-export const Categories = () => {
+const Categories = () => {
   const navigate = useNavigate();
   const handleClick = (data) => () => {
     navigate(`/products?type=${data.type}&category=${data.category}`);
@@ -51,3 +51,5 @@ export const Categories = () => {
     </Flex>
   );
 };
+
+export default Categories;

@@ -8,7 +8,7 @@ const contentStyle = {
   textAlign: 'center',
 //   background: '#364d79',
 };
-export const RichCollection = () => {
+const RichCollection = () => {
   return (
     <div>
         <h2 className='md:my-8 my-4 text-black font-bold text-center md:text-4xl text-2xl'>Rich Heritage. Boldly Reimagined</h2>
@@ -29,5 +29,7 @@ export const RichCollection = () => {
     </div>
   )
 }
+
+export default RichCollection;
 
  

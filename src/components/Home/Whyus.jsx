@@ -17,7 +17,7 @@ const data = [
   }
 ]
 
-export const Whyus = () => {
+const Whyus = () => {
   const size = useWindowSize()
 
   return size == 'sm' || size == 'xs' ? <Carousel dots dotPosition='bottom' autoplay infinite>
@@ -40,3 +40,5 @@ export const Whyus = () => {
   </Flex>
 
 }
+
+export default Whyus;

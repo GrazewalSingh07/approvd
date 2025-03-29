@@ -17,7 +17,7 @@ const data = [
   }
 ]
 
-export const ChooseUs = () => {
+ const ChooseUs = () => {
   const size = useWindowSize()
 
   return size == 'sm' || size == 'xs' ? <Carousel dots dotPosition='bottom' autoplay infinite>
@@ -42,3 +42,5 @@ export const ChooseUs = () => {
   </Flex>
 
 }
+
+export default ChooseUs;

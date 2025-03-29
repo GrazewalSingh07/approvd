@@ -8,7 +8,7 @@ const contentStyle = {
   textAlign: 'center',
 //   background: '#364d79',
 };
-export const Hero = () => {
+const Hero = () => {
   return (
     <div>
         <Carousel autoplay arrows dotPosition="left" infinite>
@@ -29,4 +29,4 @@ export const Hero = () => {
   )
 }
 
- 
+export default Hero;
