@@ -1,5 +1,12 @@
-import { doc, getDoc } from "firebase/firestore";
-import { useState } from "react";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { useState, useEffect } from "react";
 import { auth, db } from "../firebase/firebase";
 import { useLocation, useNavigate } from "react-router";
 import {
@@ -53,7 +60,7 @@ export const ProductDetail = () => {
         const productSnapshot = await getDoc(productDoc);
 
         if (productSnapshot.exists()) {
-          return productSnapshot.data();
+          return { ...productSnapshot.data(), id: productSnapshot.id };
         } else {
           console.log("No such document!");
         }
@@ -95,6 +102,34 @@ export const ProductDetail = () => {
     },
   });
 
+  const fetchSimilarProducts = async () => {
+    const category = product?.category;
+    if (category) {
+      const productCollection = collection(db, "products");
+      const q = query(productCollection, where("category", "==", category));
+      const productSnapshot = await getDocs(q);
+      const productList = productSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return productList;
+    }
+  };
+
+  const {
+    data: similarProducts,
+    isLoading: isLoadingSimilar,
+    error: errorSimilar,
+  } = useQuery({
+    queryKey: ["similar", product?.category],
+    queryFn: fetchSimilarProducts,
+    enabled: !!product?.category,
+  });
+
+  useEffect(() => {
+    console.log("similarProducts", similarProducts, product);
+  }, [similarProducts]);
+
   const handleAddToCart = async () => {
     toast.dismiss();
     if (!currentUser) {
@@ -117,6 +152,11 @@ export const ProductDetail = () => {
       size: selectedSize,
     };
     mutate(cartItem);
+  };
+
+  const similarProductClick = (id) => {
+    if (!id) return;
+    navigate(`/products/detail?id=${id}`);
   };
 
   const handleBuyNow = () => {
@@ -419,34 +459,45 @@ export const ProductDetail = () => {
           <Title level={3} className="mb-0">
             You May Also Like
           </Title>
-          <Button type="link">View All</Button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((item) => (
-            <div
-              key={item}
-              className="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-            >
-              <div className="aspect-square overflow-hidden bg-gray-50">
-                <img
-                  src="/placeholder-image.jpg"
-                  alt="Product"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-3">
-                <Text strong className="line-clamp-1">
-                  Similar Product Name
-                </Text>
-                <div className="flex items-center justify-between mt-1">
-                  <Text className="font-semibold">₹899</Text>
-                  <Text type="secondary" className="line-through text-sm">
-                    ₹1299
+          {similarProducts?.map((item) =>
+            item.id !== product.id ? (
+              <div
+                onClick={() => similarProductClick(item.id)}
+                key={item.id}
+                className="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+              >
+                <div className="aspect-square overflow-hidden bg-gray-50">
+                  <Carousel
+                    autoplay={false}
+                    className="product-carousel h-[280px]"
+                    dots={{ className: "custom-dots" }}
+                  >
+                    {item.images?.map((image, idx) => (
+                      <img
+                        key={idx}
+                        src={image}
+                        alt={item.name}
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ))}
+                  </Carousel>
+                </div>
+                <div className="p-3">
+                  <Text strong className="line-clamp-1">
+                    {item.name}
                   </Text>
+                  <div className="flex items-center justify-between mt-1">
+                    <Text className="font-semibold">{item.price}</Text>
+                    <Text type="secondary" className="line-through text-sm">
+                      {item.originalPrice}
+                    </Text>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ) : null,
+          )}
         </div>
       </div>
     </div>

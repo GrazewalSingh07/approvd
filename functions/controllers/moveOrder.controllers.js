@@ -57,22 +57,43 @@ export const moveCartToOrders = async (userId, paymentId) => {
     hsn: item.hsn,
   }));
 
+const totalDimensions = cartData.items.reduce((acc, i) => {
+    if(i.dimensions) {
+    acc.dimensions['length'] = Math.max(acc.dimensions['length'], i.dimensions['length'])
+    acc.dimensions['breadth'] = Math.max(acc.dimensions['breadth'], i.dimensions['breadth'])
+    acc.dimensions['height'] = Math.max(acc.dimensions['height'], i.dimensions['height'])
+    acc.dimensions['weight'] += i.dimensions['weight']
+    }
+    return acc
+}, {dimensions: {length: 0, breadth: 0, height: 0, weight: 0}})
+
+  const order_items = cartData.items.reduce((acc, item) => {
+    acc
+  } , []);
+
+  const userRef = db.collection("users").doc(userId);
+  const userDoc = await userRef.get();
+  if (!userDoc.exists) {
+    throw new Error("User not found");
+  }
+  const userData = userDoc.data();
+
   const orderData = {
     order_id: orderId,
     order_date: writeDate.toLocaleString(),
     pickup_location: "Primary",
     channel_id: "",
     comment: "Test order for debugging",
-    billing_customer_name: "Naruto",
-    billing_last_name: "Uzumaki",
-    billing_address: "House 221B, Leaf Village",
-    billing_address_2: "Near Hokage House",
-    billing_city: "New Delhi",
-    billing_pincode: "110002",
-    billing_state: "Delhi",
-    billing_country: "India",
-    billing_email: "naruto@uzumaki.com",
-    billing_phone: "9876543210",
+    billing_customer_name: userData.billing_customer_name,
+    billing_last_name: userData.billing_last_name,
+    billing_address: userData.billing_address,
+    billing_address_2: userData.billing_address_2,
+    billing_city: userData.billing_city,
+    billing_pincode: userData.billing_pincode,
+    billing_state: userData.billing_state,
+    billing_country: userData.billing_country,
+    billing_email: userData.billing_email,
+    billing_phone: userData.billing_phone,
     shipping_is_billing: true,
     order_items,
     payment_method: "Prepaid",
@@ -81,10 +102,7 @@ export const moveCartToOrders = async (userId, paymentId) => {
     transaction_charges: 0,
     total_discount: 0,
     sub_total: cartData.totalPrice,
-    length: 10,
-    breadth: 15,
-    height: 20,
-    weight: 2.5,
+    ...totalDimensions.dimensions,
   };
 
   await createShiprocketOrder(orderData);
