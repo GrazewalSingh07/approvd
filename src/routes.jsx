@@ -1,4 +1,4 @@
-import { Home } from "./pages/Home";
+import Home from "./pages/Home";
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
 import { Products } from "./pages/Products";
@@ -8,6 +8,8 @@ import { Orders } from "./pages/Orders";
 import { Address } from "./pages/Address";
 import { OrderSummary } from "./pages/OrderSummary";
 import { Profile } from "./pages/UserProfile";
+import { ErrorPage } from "./components/ErrorPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const routesArray = [
   {
@@ -24,7 +26,7 @@ export const routesArray = [
   },
   {
     path: "/profile",
-    element: <Profile />,
+    element:  <ProtectedRoute><Profile /></ProtectedRoute>,
   },
   {
     path: "/products",
@@ -36,18 +38,22 @@ export const routesArray = [
   },
   {
     path: "/cart",
-    element: <Cart />,
+    element: <ProtectedRoute><Cart /></ProtectedRoute>,
   },
   {
     path: "/address",
-    element: <Address />,
+    element: <ProtectedRoute><Address /></ProtectedRoute>,
   },
   {
     path: "/orders",
-    element: <Orders />,
+    element: <ProtectedRoute><Orders /></ProtectedRoute>,
   },
   {
     path: "/order-summary",
-    element: <OrderSummary />,
+    element: <ProtectedRoute><OrderSummary /></ProtectedRoute>,
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
   },
 ];

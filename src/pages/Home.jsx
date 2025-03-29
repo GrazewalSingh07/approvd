@@ -1,18 +1,22 @@
-import { Hero } from "../components/Home/Hero";
-import { Categories } from "../components/Home/Categories";
-import { Whyus } from "../components/Home/Whyus";
-import { RichCollection } from "../components/Home/RichCollection";
-import { ShoeCategory } from "../components/Home/ShoeCategory";
-import { ChooseUs } from "../components/Home/ChooseUs";
-export const Home = () => {
+import { lazy } from "react";
+const Hero = lazy(() => import("../components/Home/Hero"));
+const Categories = lazy(() => import("../components/Home/Categories"));
+const Whyus = lazy(() => import("../components/Home/Whyus"));
+const RichCollection = lazy(() => import("../components/Home/RichCollection"));
+const ShoeCategory = lazy(() => import("../components/Home/ShoeCategory"));
+const ChooseUs = lazy(() => import("../components/Home/ChooseUs"));
+
+const Home = () => {
   return (
-    <div>
+    <>
       <Hero />
       <Categories />
       <Whyus />
       <RichCollection />
       <ShoeCategory />
       <ChooseUs />
-    </div>
+    </>
   );
 };
+
+export default Home;
