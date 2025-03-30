@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 const Login = () => {
+  const { refreshAuthState } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,6 +34,7 @@ const Login = () => {
           return;
         }
         toast.success("Successfully signed in");
+        refreshAuthState();
         navigate("/");
       }
     }

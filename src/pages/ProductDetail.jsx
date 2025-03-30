@@ -37,11 +37,13 @@ import { QuantityCounter } from "../customComponents/QuantityCounter";
 import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart, getCartData } from "../services/cart.service";
+import { useAuth } from "../contexts/authContext";
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 export const ProductDetail = () => {
+  const { userLoggedIn } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = auth.currentUser;
@@ -161,7 +163,9 @@ export const ProductDetail = () => {
 
   const handleBuyNow = () => {
     handleAddToCart();
+    if (userLoggedIn) {
     navigate("/cart");
+    }
   };
 
   const discount = product

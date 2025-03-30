@@ -13,9 +13,11 @@ const clearCart = async (userId) => {
 };
 
 export const moveCartToOrders = async (userId, paymentId) => {
-  const payment = await razorpay.payments.fetch(paymentId);
-  if (payment.status !== "captured") {
-    throw new Error("Payment not captured");
+  if (paymentId) {
+    const payment = await razorpay.payments.fetch(paymentId);
+    if (payment.status !== "captured") {
+      throw new Error("Payment not captured");
+    }
   }
 
   const cartRef = db.collection("carts").doc(userId);
@@ -28,14 +30,22 @@ export const moveCartToOrders = async (userId, paymentId) => {
   const cartData = cartDoc.data();
   const orderRef = db.collection("orders").doc();
 
-  const response = await orderRef.set({
+  const payment_method = paymentId ? "Prepaid" : "COD";
+
+  const orderDetails = {
     userId,
     items: cartData.items,
     totalPrice: cartData.totalPrice,
-    paymentId,
+    payment_method,
     status: "pending",
     createdAt: admin.firestore.Timestamp.now(),
-  });
+  };
+
+  if (paymentId) {
+    orderDetails["paymentId"] = paymentId;
+  }
+
+  const response = await orderRef.set(orderDetails);
 
   const writeTime = response._writeTime;
 
@@ -57,19 +67,27 @@ export const moveCartToOrders = async (userId, paymentId) => {
     hsn: item.hsn,
   }));
 
-const totalDimensions = cartData.items.reduce((acc, i) => {
-    if(i.dimensions) {
-    acc.dimensions['length'] = Math.max(acc.dimensions['length'], i.dimensions['length'])
-    acc.dimensions['breadth'] = Math.max(acc.dimensions['breadth'], i.dimensions['breadth'])
-    acc.dimensions['height'] = Math.max(acc.dimensions['height'], i.dimensions['height'])
-    acc.dimensions['weight'] += i.dimensions['weight']
-    }
-    return acc
-}, {dimensions: {length: 0, breadth: 0, height: 0, weight: 0}})
-
-  const order_items = cartData.items.reduce((acc, item) => {
-    acc
-  } , []);
+  const totalDimensions = cartData.items.reduce(
+    (acc, i) => {
+      if (i.dimensions) {
+        acc.dimensions["length"] = Math.max(
+          acc.dimensions["length"],
+          i.dimensions["length"],
+        );
+        acc.dimensions["breadth"] = Math.max(
+          acc.dimensions["breadth"],
+          i.dimensions["breadth"],
+        );
+        acc.dimensions["height"] = Math.max(
+          acc.dimensions["height"],
+          i.dimensions["height"],
+        );
+        acc.dimensions["weight"] += i.dimensions["weight"];
+      }
+      return acc;
+    },
+    { dimensions: { length: 0, breadth: 0, height: 0, weight: 0 } },
+  );
 
   const userRef = db.collection("users").doc(userId);
   const userDoc = await userRef.get();
@@ -96,7 +114,7 @@ const totalDimensions = cartData.items.reduce((acc, i) => {
     billing_phone: userData.billing_phone,
     shipping_is_billing: true,
     order_items,
-    payment_method: "Prepaid",
+    payment_method,
     shipping_charges: 0,
     giftwrap_charges: 0,
     transaction_charges: 0,

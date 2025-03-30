@@ -6,7 +6,6 @@ import {
   Flex,
   Space,
   Tooltip,
-  message,
 } from "antd";
 import React, { useState } from "react";
 import { IoCartOutline, IoMailOutline } from "react-icons/io5";
@@ -20,7 +19,6 @@ import { getCartData } from "../../services/cart.service";
 import toast from "react-hot-toast";
 
 export const Navbar = () => {
-  const [messageApi, contextHolder] = message.useMessage();
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState("right");
   const { userLoggedIn } = useAuth();
@@ -28,6 +26,7 @@ export const Navbar = () => {
   const { data: cartItems } = useQuery({
     queryKey: ["cart"],
     queryFn: getCartData,
+    enabled: userLoggedIn
   });
 
   const showDrawer = () => {

@@ -21,21 +21,44 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCartData } from "../services/cart.service";
 import { calculateTotals } from "../utils/calculateTotals";
 import { formattedPrice } from "../utils/formattedPrice";
 import RazorpayPayment from "../customComponents/RazorpayPayment";
 import { getUserData } from "../services/user.service";
 import { useAuth } from "../contexts/authContext";
+import { getCurrentUser } from "../services/userAuth";
+import toast from "react-hot-toast";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
+
+const apiBaseUrl = import.meta.env.VITE_FIREBASE_API_BASEURL;
 
 export const OrderSummary = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(2);
   const { userLoggedIn, currentUser } = useAuth();
+
+  const { mutateAsync: createCodOrder } = useMutation({
+    mutationFn: async () => {
+      const token = await getCurrentUser().getIdToken();
+      return await fetch(apiBaseUrl + "/cod/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+  });
+
+  const handleCashOnDelivery = async () => {
+    await createCodOrder();
+    toast.success("Order placed successfully!");
+    navigate("/orders");
+  };
 
   const { data: userData } = useQuery({
     queryKey: ["user"],
@@ -207,6 +230,15 @@ export const OrderSummary = () => {
                   cartData={cartData}
                   totalAmount={totals.totalPrice}
                 />
+                <Button
+                  type="default"
+                  size="large"
+                  block
+                  onClick={handleCashOnDelivery}
+                  icon={<CheckCircleOutlined />}
+                >
+                  Cash on Delivery
+                </Button>
                 <Button
                   type="default"
                   size="large"

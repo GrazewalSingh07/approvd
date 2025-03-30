@@ -65,7 +65,7 @@ export const verifyRazorpayPayment = async (req, res) => {
     await cartRef.update({ payment_status: "success" });
     await moveCartToOrders(uid, razorpay_payment_id);
 
-    res.status(200).json({ message: "Payment verified successfully" });
+    res.status(200).json({ message: "Order placed successfully" });
   } catch (error) {
     console.error("Verify payment error:", error);
     res.status(500).json({ error: "Payment verification failed" });
