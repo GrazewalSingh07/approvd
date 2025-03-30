@@ -2,6 +2,7 @@ import { db } from "../index.js";
 import admin from "firebase-admin";
 import Razorpay from "razorpay";
 import { createShiprocketOrder } from "./shiprocket.controllers.js";
+import { format } from "date-fns";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_TEST_KEY_ID,
@@ -53,7 +54,7 @@ export const moveCartToOrders = async (userId, paymentId) => {
     writeTime._seconds * 1000 + writeTime._nanoseconds / 1000000,
   );
 
-  console.log("Write operation completed at:", writeDate.toLocaleString());
+  const formattedOrderDate = format(writeDate, "yyyy-MM-dd");
 
   const orderId = orderRef.id;
   // modify the order for the shipping data
@@ -64,7 +65,6 @@ export const moveCartToOrders = async (userId, paymentId) => {
     selling_price: item.price,
     discount: 0,
     tax: 0,
-    hsn: item.hsn,
   }));
 
   const totalDimensions = cartData.items.reduce(
@@ -98,9 +98,8 @@ export const moveCartToOrders = async (userId, paymentId) => {
 
   const orderData = {
     order_id: orderId,
-    order_date: writeDate.toLocaleString(),
+    order_date: formattedOrderDate,
     pickup_location: "Primary",
-    channel_id: "",
     comment: "Test order for debugging",
     billing_customer_name: userData.billing_customer_name,
     billing_last_name: userData.billing_last_name,
@@ -115,10 +114,6 @@ export const moveCartToOrders = async (userId, paymentId) => {
     shipping_is_billing: true,
     order_items,
     payment_method,
-    shipping_charges: 0,
-    giftwrap_charges: 0,
-    transaction_charges: 0,
-    total_discount: 0,
     sub_total: cartData.totalPrice,
     ...totalDimensions.dimensions,
   };

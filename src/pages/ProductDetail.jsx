@@ -152,6 +152,7 @@ export const ProductDetail = () => {
       totalPrice: product.price * quantity,
       image: product.images[0],
       size: selectedSize,
+      dimensions: product.dimensions,
     };
     mutate(cartItem);
   };
@@ -164,7 +165,7 @@ export const ProductDetail = () => {
   const handleBuyNow = () => {
     handleAddToCart();
     if (userLoggedIn) {
-    navigate("/cart");
+      navigate("/cart");
     }
   };
 

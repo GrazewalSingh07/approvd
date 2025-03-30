@@ -21,7 +21,7 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCartData } from "../services/cart.service";
 import { calculateTotals } from "../utils/calculateTotals";
 import { formattedPrice } from "../utils/formattedPrice";
@@ -37,6 +37,7 @@ const { Step } = Steps;
 const apiBaseUrl = import.meta.env.VITE_FIREBASE_API_BASEURL;
 
 export const OrderSummary = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(2);
   const { userLoggedIn, currentUser } = useAuth();
@@ -56,6 +57,7 @@ export const OrderSummary = () => {
 
   const handleCashOnDelivery = async () => {
     await createCodOrder();
+    queryClient.invalidateQueries({ queryKey: ["cart"] });
     toast.success("Order placed successfully!");
     navigate("/orders");
   };
