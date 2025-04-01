@@ -19,6 +19,7 @@ import {
   CheckCircleOutlined,
   ArrowRightOutlined,
   HomeOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ import { getUserData } from "../services/user.service";
 import { useAuth } from "../contexts/authContext";
 import { getCurrentUser } from "../services/userAuth";
 import toast from "react-hot-toast";
+import { Spin } from "antd";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -42,18 +44,19 @@ export const OrderSummary = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const { userLoggedIn, currentUser } = useAuth();
 
-  const { mutateAsync: createCodOrder } = useMutation({
-    mutationFn: async () => {
-      const token = await getCurrentUser().getIdToken();
-      return await fetch(apiBaseUrl + "/cod/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
-  });
+  const { mutateAsync: createCodOrder, isLoading: isCreatingOrder } =
+    useMutation({
+      mutationFn: async () => {
+        const token = await getCurrentUser().getIdToken();
+        return await fetch(apiBaseUrl + "/cod/create-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      },
+    });
 
   const handleCashOnDelivery = async () => {
     await createCodOrder();
@@ -237,7 +240,13 @@ export const OrderSummary = () => {
                   size="large"
                   block
                   onClick={handleCashOnDelivery}
-                  icon={<CheckCircleOutlined />}
+                  icon={
+                    isCreatingOrder ? (
+                      <Spin indicator={<LoadingOutlined spin />} />
+                    ) : (
+                      <CheckCircleOutlined />
+                    )
+                  }
                 >
                   Cash on Delivery
                 </Button>
