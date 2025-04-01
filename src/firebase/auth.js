@@ -7,6 +7,8 @@ import {
   sendEmailVerification,
   updatePassword,
   signInWithPopup,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
   GoogleAuthProvider,
 } from "firebase/auth";
 
@@ -33,6 +35,27 @@ export const doCreateUserWithEmailAndPassword = async (
     });
 
     return user;
+  } catch (error) {
+    return { error: true, message: error.message };
+  }
+};
+
+export const doCreateUserWithNumberAndPassword = async (
+  phoneNumber,
+  password,
+) => {
+  try {
+    const appVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size: "invisible",
+      callback: async (response) => {
+        const confirmationResult = await signInWithPhoneNumber(
+          auth,
+          phoneNumber,
+          appVerifier,
+        );
+      },
+    });
+    return confirmationResult;
   } catch (error) {
     return { error: true, message: error.message };
   }
