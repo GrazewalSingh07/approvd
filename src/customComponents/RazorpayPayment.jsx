@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "antd";
 import toast from "react-hot-toast";
-import { getCurrentUser } from "../services/userAuth";
 import { useNavigate } from "react-router";
 import { updateCart } from "../services/cart.service";
-
-const firebaseRazorpayBaseUrl = import.meta.env.VITE_FIREBASE_API_BASEURL;
+import { createOrder, verifyPayment } from "../services/razorpay.service";
 
 const RazorpayPayment = ({ totalAmount }) => {
   const navigate = useNavigate();
@@ -37,21 +35,9 @@ const RazorpayPayment = ({ totalAmount }) => {
       return;
     }
 
-    const token = await getCurrentUser().getIdToken();
-
     try {
-      const result = await fetch(
-        firebaseRazorpayBaseUrl + "/razorpay/create-order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ amount: totalAmount }),
-        },
-      );
-      const { amount, id: order_id, currency } = await result.json();
+      const result = await createOrder({ amount: totalAmount })
+      const { amount, id: order_id, currency } = result?.data;
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_TEST_KEY_ID,
@@ -59,24 +45,16 @@ const RazorpayPayment = ({ totalAmount }) => {
         currency,
         name: "Approvd",
         description: "Test Transaction",
-        order_id, // This is the order ID created by Razorpay
-        handler: async function (response) {
+        order_id,
+        handler: async function(response) {
           await updateCart(response);
-          fetch(firebaseRazorpayBaseUrl + "/razorpay/verify-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(response),
-          }).then((res) => {
-            if (res.status === 200) {
-              toast.success("Payment verified successfully");
-              navigate("/");
-            } else {
-              toast.error("Payment verification failed");
-            }
-          });
+          const verifyResponse = await verifyPayment(response);
+          if (verifyResponse.status === 200) {
+            toast.success("Payment verified successfully");
+            navigate("/");
+          } else {
+            toast.error("Payment verification failed");
+          }
         },
         prefill: {
           name: "Customer Name",
@@ -88,7 +66,6 @@ const RazorpayPayment = ({ totalAmount }) => {
         },
       };
 
-      // open the payment window
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (error) {

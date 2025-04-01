@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebase";
 // import { GoogleAuthProvider } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
+import instance from "../../../axios.config.js"
 
 const AuthContext = React.createContext();
 
@@ -33,6 +34,8 @@ export function AuthProvider({ children }) {
       );
       setIsEmailUser(isEmail);
       const isLoggedIn = !isEmail || (isEmail && user.emailVerified);
+      const token = await auth.currentUser.getIdToken()
+      instance.defaults.headers.common['Authorization'] = `Bearer ${token}`
       setUserLoggedIn(isLoggedIn);
     } else {
       // No user is signed in
