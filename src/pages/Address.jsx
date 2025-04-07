@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AddressForm } from "../customComponents/AddressForm/AddressForm";
+import { AddressForm } from "@/customComponents/AddressForm/AddressForm";
 import { Steps } from "antd";
 import {
   FileTextOutlined,
@@ -7,8 +7,8 @@ import {
   ShoppingOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import { getUserData, updateUserDetails } from "../services/user.service";
-import { useAuth } from "../contexts/authContext";
+import { getUserData, updateUserDetails } from "@/services/user.service";
+import { useAuth } from "@/contexts/authContext";
 import { useQuery } from "@tanstack/react-query";
 
 export const Address = () => {

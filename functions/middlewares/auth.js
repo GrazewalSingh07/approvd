@@ -1,7 +1,6 @@
 import admin from "firebase-admin";
 
 export const authenticate = async (req, res, next) => {
-  if (req.url.endsWith("/test")) return;
   const token = req.headers.authorization?.split("Bearer ")[1];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });

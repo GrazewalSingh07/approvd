@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Input, Button, Select, Row, Col, Typography } from "antd";
 
 const { Title } = Typography;
@@ -55,7 +55,6 @@ export const AddressForm = ({
     onSubmit(values);
   };
 
-  // Initialize form with provided values or defaults
   React.useEffect(() => {
     form.setFieldsValue(initialValues);
   }, [form, initialValues]);
@@ -74,7 +73,6 @@ export const AddressForm = ({
         requiredMark={false}
       >
         <Row gutter={16}>
-          {/* First Name */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_customer_name"
@@ -87,7 +85,6 @@ export const AddressForm = ({
             </Form.Item>
           </Col>
 
-          {/* Last Name */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_last_name"
@@ -101,7 +98,6 @@ export const AddressForm = ({
           </Col>
         </Row>
 
-        {/* Email */}
         <Form.Item
           name="billing_email"
           label="Email"
@@ -113,7 +109,6 @@ export const AddressForm = ({
           <Input placeholder="Enter your email address" />
         </Form.Item>
 
-        {/* Phone */}
         <Form.Item
           name="billing_phone"
           label="Phone Number"
@@ -128,7 +123,6 @@ export const AddressForm = ({
           <Input placeholder="Enter your 10-digit phone number" />
         </Form.Item>
 
-        {/* Address Line 1 */}
         <Form.Item
           name="billing_address"
           label="Address Line 1"
@@ -137,13 +131,11 @@ export const AddressForm = ({
           <Input placeholder="Enter your street address" />
         </Form.Item>
 
-        {/* Address Line 2 */}
         <Form.Item name="billing_address_2" label="Address Line 2">
           <Input placeholder="Apartment, suite, unit, building, floor, etc." />
         </Form.Item>
 
         <Row gutter={16}>
-          {/* City */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_city"
@@ -154,7 +146,6 @@ export const AddressForm = ({
             </Form.Item>
           </Col>
 
-          {/* PIN Code */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_pincode"
@@ -173,7 +164,6 @@ export const AddressForm = ({
         </Row>
 
         <Row gutter={16}>
-          {/* State */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_state"
@@ -190,7 +180,6 @@ export const AddressForm = ({
             </Form.Item>
           </Col>
 
-          {/* Country */}
           <Col xs={24} md={12}>
             <Form.Item
               name="billing_country"
@@ -203,7 +192,6 @@ export const AddressForm = ({
           </Col>
         </Row>
 
-        {/* Submit Button */}
         <Form.Item className="mt-6">
           <Button
             type="primary"

@@ -1,8 +1,8 @@
 import { Button, Row, Col, Collapse } from "antd";
-import useWindowSize from "../hooks/useBreakpoints";
+import useWindowSize from "@/hooks/useBreakpoints";
 import { ArrowRightOutlined, DeleteOutlined } from "@ant-design/icons";
 import RazorpayPayment from "../customComponents/RazorpayPayment";
-import { calculateTotals } from "../utils/calculateTotals";
+import { calculateTotals } from "@/utils/calculateTotals";
 import { useQuery } from "@tanstack/react-query";
 import { Steps } from "antd";
 import { useNavigate } from "react-router";
